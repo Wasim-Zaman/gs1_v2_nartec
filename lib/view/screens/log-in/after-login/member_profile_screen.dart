@@ -8,6 +8,7 @@ import 'package:hiring_task/constants/icons/app_icons.dart';
 import 'package:hiring_task/models/login-models/dashboard_model.dart';
 import 'package:hiring_task/models/login-models/profile/member_profile_model.dart';
 import 'package:hiring_task/res/common/common.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/view-model/login/after-login/profile/member_profile_services.dart';
 import 'package:hiring_task/view/screens/log-in/widgets/text_widgets/primary_text_widget.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
@@ -180,8 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? addressImageFile;
   String? addressImageFileName;
 
-  String? img;
-  String? addImg;
+  String? img, addImg;
 
   // scaffold key
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -210,10 +210,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       Common.urlToFile(img!)
           .then((value) => imageFile = value)
-          .whenComplete(() => setState(() {}));
+          .catchError((error) {
+        Common.showToast("Error: $error");
+      });
       Common.urlToFile(addImg!)
           .then((value) => addressImageFile = value)
-          .whenComplete(() => setState(() {}));
+          .catchError((error) {
+        Common.showToast("Error: $error");
+      });
     });
 
     super.initState();
@@ -322,12 +326,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 30),
                               child: ElevatedButton(
-                                onPressed: () async {
-                                  await ImagePicker()
-                                      .getImage(source: ImageSource.gallery)
+                                onPressed: () {
+                                  ImagePicker()
+                                      .pickImage(source: ImageSource.gallery)
                                       .then((value) {
+                                    if (value == null) return;
                                     setState(() {
-                                      imageFile = File(value!.path);
+                                      imageFile = File(value.path);
                                       imageFileName =
                                           value.path.split('/').last;
                                     });
@@ -804,10 +809,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       TextButton(
                         onPressed: () async {
                           await ImagePicker()
-                              .getImage(source: ImageSource.gallery)
+                              .pickImage(source: ImageSource.gallery)
                               .then((value) {
+                            if (value == null) return;
                             setState(() {
-                              addressImageFile = File(value!.path);
+                              addressImageFile = File(value.path);
                               addressImageFileName = value.path.split('/').last;
                             });
                           });
@@ -827,7 +833,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () async {
+              AppDialogs.loadingDialog(context);
               await update(context);
+              AppDialogs.closeDialog();
             },
             label: const Text('Update'),
             icon: const Icon(Icons.update),
@@ -874,6 +882,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         unitNo: unitNoController.text,
       );
 
+      print("status : $status");
+
       if (status == 200) {
         Common.showToast(
           'Successfully Updated Profile',
@@ -886,6 +896,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
+      print(e.toString());
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

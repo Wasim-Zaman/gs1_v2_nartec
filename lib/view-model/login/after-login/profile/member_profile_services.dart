@@ -31,6 +31,7 @@ class MemberProfileServices {
     File? addressImage,
     String? userId,
   }) async {
+    // print image path to see its formate
     var request = http.MultipartRequest(
         'POST', Uri.parse('${BaseUrl.gs1}/api/member/profile/update'));
 
@@ -65,6 +66,8 @@ class MemberProfileServices {
       imageLength,
       filename: image.path,
     );
+
+    print("image multipart file: ${imageMultipartFile.filename}");
     request.files.add(imageMultipartFile);
 
     var addressImageStream = http.ByteStream(addressImage!.openRead());
@@ -81,9 +84,9 @@ class MemberProfileServices {
 
     try {
       final response = await request.send();
-
+      final responseBody = await response.stream.bytesToString();
+      print("Response body: $responseBody");
       if (response.statusCode == 200) {
-        final responseBody = await response.stream.bytesToString();
         print(responseBody);
         return 200;
       } else if (response.statusCode == 500) {
@@ -91,7 +94,7 @@ class MemberProfileServices {
         throw Exception('Internal Server Error!');
       } else {
         print(response.statusCode);
-        return 400;
+        return response.statusCode;
       }
     } catch (error) {
       rethrow;
