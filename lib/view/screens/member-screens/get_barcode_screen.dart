@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:hiring_task/constants/colors/app_colors.dart';
 import 'package:hiring_task/models/member-registration/documents_model.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/member-registration/get_documents_service.dart';
@@ -54,7 +55,7 @@ class _GetBarcodeScreenState extends State<GetBarcodeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(226, 227, 231, 1),
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

@@ -9,7 +9,6 @@ class ActivitiesService {
   static Future<List<ActivitiesModel>> getActivities(String? cr_number) async {
     const baseUrl = '${BaseUrl.gs1WithPort}/api/GellCRBYCRNO';
 
-    print('Wait....');
     final uri = Uri.parse(baseUrl);
 
     final response = await http.post(
@@ -29,7 +28,6 @@ class ActivitiesService {
     if (response.statusCode == 200) {
       // handle successful response
       final responseBody = json.decode(response.body) as List;
-      print('responseBody: $responseBody');
       for (var element in responseBody) {
         listOfActivities.add(ActivitiesModel.fromJson(element));
       }

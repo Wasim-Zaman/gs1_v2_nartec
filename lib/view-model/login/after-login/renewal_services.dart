@@ -19,7 +19,7 @@ class RenewalServices {
     final otherPrice = otherSubscription?.map((e) => e.otherprice).toList();
     final yearlyFee = [...otherPrice!];
     int? x = int.parse(subscritionModel.gtinSubscription!.gtinprice.toString());
-    yearlyFee.insert(0, x);
+    yearlyFee.insert(0, x.toString());
 
     final yearlyFeeMap = {};
     final productsMap = {};
@@ -79,6 +79,7 @@ class RenewalServices {
           },
         ),
       );
+
       if (response.statusCode == 200) {
       } else {
         throw Exception('Renewal Failed');

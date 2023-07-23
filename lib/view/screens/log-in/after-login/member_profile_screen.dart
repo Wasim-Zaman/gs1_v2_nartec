@@ -12,11 +12,13 @@ import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/view-model/login/after-login/profile/member_profile_services.dart';
 import 'package:hiring_task/view/screens/log-in/widgets/text_widgets/primary_text_widget.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
+import 'package:hiring_task/widgets/buttons/primary_button_widget.dart';
 import 'package:hiring_task/widgets/custom_drawer_widget.dart';
 import 'package:hiring_task/widgets/images/image_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class MemberProfileScreen extends StatefulWidget {
   const MemberProfileScreen({super.key});
@@ -129,11 +131,9 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
           showElevation: true, // use this to remove appBar's elevation
           onItemSelected: (index) => setState(() {
             _selectedIndex = index;
-            pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.bounceInOut,
-            );
+            pageController.animateToPage(index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.ease);
           }),
           items: [
             BottomNavyBarItem(
@@ -175,6 +175,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final qrCodeNoController = TextEditingController();
   final companyIdController = TextEditingController();
   final mobileExtensionController = TextEditingController();
+  final countryNameController = TextEditingController();
+  final crNumberController = TextEditingController();
+  final activitiesController = TextEditingController();
 
   File? imageFile;
   String? imageFileName;
@@ -201,24 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     unitNoController.text = profile?.unitNumber ?? '';
     qrCodeNoController.text = profile?.qrCorde ?? '';
     companyIdController.text = profile?.companyID ?? '';
-
-    Future.delayed(Duration.zero, () {
-      img =
-          "${widget.memberProfileModel?.memberProfile?.imagePath}/${widget.memberProfileModel?.memberProfile?.image}";
-      addImg =
-          "${widget.memberProfileModel?.memberProfile?.imagePath}/${widget.memberProfileModel?.memberProfile?.addressImage}";
-
-      Common.urlToFile(img!)
-          .then((value) => imageFile = value)
-          .catchError((error) {
-        Common.showToast("Error: $error");
-      });
-      Common.urlToFile(addImg!)
-          .then((value) => addressImageFile = value)
-          .catchError((error) {
-        Common.showToast("Error: $error");
-      });
-    });
+    countryNameController.text = profile?.address?.countryName ?? "";
 
     super.initState();
   }
@@ -238,11 +224,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     qrCodeNoController.dispose();
     companyIdController.dispose();
     mobileExtensionController.dispose();
+    countryNameController.dispose();
+    crNumberController.dispose();
+    activitiesController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    img =
+        "${widget.memberProfileModel?.memberProfile?.imagePath}/${widget.memberProfileModel?.memberProfile?.image}";
+    addImg =
+        "${widget.memberProfileModel?.memberProfile?.imagePath}/${widget.memberProfileModel?.memberProfile?.addressImage}";
+
+    Common.urlToFile(img!).then((value) => imageFile = value);
+    Common.urlToFile(addImg!).then((value) => addressImageFile = value);
+
     return WillPopScope(
       onWillPop: () {
         // Navigator.pop(context);
@@ -432,13 +429,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const RequiredTextWidget(title: "County"),
-                              TextFormField(
-                                enabled: false,
+                              TextField(
+                                enabled: true,
+                                controller: countryNameController,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                 ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.address?.countryName,
                               ),
                               const SizedBox(height: 10),
                               const RequiredTextWidget(
@@ -752,6 +748,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
+                    ExpansionPanelRadio(
+                      value: 9,
+                      headerBuilder: (context, isExpanded) {
+                        return ListTile(
+                          leading: Image.asset(
+                              "${AppIcons.membershipIconsBasePath}company_id_section.png"),
+                          title: const Text(
+                            'CR Number and Activities',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      },
+                      body: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const RequiredTextWidget(title: "CR Number"),
+                              CustomTextField(
+                                hintText: "CR Number",
+                                controller: crNumberController,
+                                readOnly: true,
+                              ),
+                              const SizedBox(height: 10),
+                              PrimaryButtonWidget(
+                                onPressed: () {},
+                                caption: "Validate CR Number",
+                              ).box.make().wFull(context),
+                              const SizedBox(height: 10),
+                              const RequiredTextWidget(title: "Activities"),
+                              CustomTextField(
+                                hintText: "Activities",
+                                controller: activitiesController,
+                                readOnly: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 Card(
@@ -866,8 +906,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             widget.memberProfileModel?.memberProfile?.companyNameArabic,
         mobile: widget.memberProfileModel?.memberProfile?.mobile,
         mobileExtension: mobileExtensionController.text,
-        countryName:
-            widget.memberProfileModel?.memberProfile?.address?.countryName,
+        countryName: countryNameController.text,
         cityName: widget.memberProfileModel?.memberProfile?.address?.cityName,
         countryShortName:
             widget.memberProfileModel?.memberProfile?.address?.countryShortName,

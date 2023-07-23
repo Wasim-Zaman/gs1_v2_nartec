@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hiring_task/models/login-models/profile/subscription_model.dart';
 import 'package:hiring_task/res/common/common.dart';
 import 'package:hiring_task/view-model/login/after-login/renewal_services.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class RenewMembershipScreen extends StatefulWidget {
   const RenewMembershipScreen({super.key});
@@ -36,23 +34,21 @@ class _RenewMembershipScreenState extends State<RenewMembershipScreen> {
   continueToPayment() async {
     Common.showToast('Loading');
 
-    
-      RenewalServices.proceedRenewal(
-        userId,
-        subscritionModel: subscriptionModel,
-      ).then((_) {
-
+    RenewalServices.proceedRenewal(
+      userId,
+      subscritionModel: subscriptionModel,
+    ).then((_) {
       Common.showToast(
         'Renewal Successful',
         backgroundColor: Colors.blue,
       );
       Navigator.of(context).pop();
-      }).catchError((e) {
-        Common.showToast(
+    }).catchError((e) {
+      Common.showToast(
         'Renewal Failed',
         backgroundColor: Colors.red,
       );
-      });    
+    });
   }
 
   @override

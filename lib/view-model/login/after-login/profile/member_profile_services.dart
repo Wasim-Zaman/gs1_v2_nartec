@@ -33,7 +33,9 @@ class MemberProfileServices {
   }) async {
     // print image path to see its formate
     var request = http.MultipartRequest(
-        'POST', Uri.parse('${BaseUrl.gs1}/api/member/profile/update'));
+      'POST',
+      Uri.parse('${BaseUrl.gs1}/api/member/profile/update'),
+    );
 
     request.fields['user_id'] = userId ?? '';
     request.fields['company_name_eng'] = companyNameEng ?? '';
@@ -89,6 +91,8 @@ class MemberProfileServices {
       if (response.statusCode == 200) {
         print(responseBody);
         return 200;
+      } else if (response.statusCode == 422) {
+        throw Exception(responseBody);
       } else if (response.statusCode == 500) {
         print(response.statusCode);
         throw Exception('Internal Server Error!');

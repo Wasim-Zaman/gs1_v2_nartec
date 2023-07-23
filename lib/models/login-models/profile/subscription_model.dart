@@ -6,24 +6,24 @@ class SubscritionModel {
 
   SubscritionModel.fromJson(Map<String, dynamic> json) {
     gtinSubscription = json['gtin_subscription'] != null
-        ? new GtinSubscription.fromJson(json['gtin_subscription'])
+        ? GtinSubscription.fromJson(json['gtin_subscription'])
         : null;
     if (json['other_subscription'] != null) {
       otherSubscription = <OtherSubscription>[];
       json['other_subscription'].forEach((v) {
-        otherSubscription!.add(new OtherSubscription.fromJson(v));
+        otherSubscription!.add(OtherSubscription.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.gtinSubscription != null) {
-      data['gtin_subscription'] = this.gtinSubscription!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (gtinSubscription != null) {
+      data['gtin_subscription'] = gtinSubscription!.toJson();
     }
-    if (this.otherSubscription != null) {
+    if (otherSubscription != null) {
       data['other_subscription'] =
-          this.otherSubscription!.map((v) => v.toJson()).toList();
+          otherSubscription!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -61,23 +61,23 @@ class GtinSubscription {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['renewGtinID'] = this.renewGtinID;
-    data['gtin'] = this.gtin;
-    data['quotation'] = this.quotation;
-    data['total_no_of_barcodes'] = this.totalNoOfBarcodes;
-    data['gtinprice'] = this.gtinprice;
-    data['yearly_fee'] = this.yearlyFee;
-    data['register_date'] = this.registerDate;
-    data['expiry'] = this.expiry;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['renewGtinID'] = renewGtinID;
+    data['gtin'] = gtin;
+    data['quotation'] = quotation;
+    data['total_no_of_barcodes'] = totalNoOfBarcodes;
+    data['gtinprice'] = gtinprice;
+    data['yearly_fee'] = yearlyFee;
+    data['register_date'] = registerDate;
+    data['expiry'] = expiry;
     return data;
   }
 }
 
 class OtherSubscription {
-  int? otherProdID;
+  num? otherProdID;
   String? otherProduct;
-  int? otherprice;
+  String? otherprice;
   String? registerDate;
   String? expiry;
   String? quotation;
@@ -100,13 +100,13 @@ class OtherSubscription {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['otherProdID'] = this.otherProdID;
-    data['other_product'] = this.otherProduct;
-    data['otherprice'] = this.otherprice;
-    data['register_date'] = this.registerDate;
-    data['expiry'] = this.expiry;
-    data['quotation'] = this.quotation;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['otherProdID'] = otherProdID;
+    data['other_product'] = otherProduct;
+    data['otherprice'] = otherprice;
+    data['register_date'] = registerDate;
+    data['expiry'] = expiry;
+    data['quotation'] = quotation;
     return data;
   }
 }
