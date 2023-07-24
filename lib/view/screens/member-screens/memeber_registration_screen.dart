@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:file_picker/file_picker.dart';
@@ -23,9 +24,11 @@ import 'package:hiring_task/view-model/member-registration/get_all_states_servic
 import 'package:hiring_task/view-model/member-registration/gpc_services.dart';
 import 'package:hiring_task/view/screens/home/home_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
+import 'package:hiring_task/widgets/dropdown_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 bool isFirstClicked = true;
 bool isSecondClicked = false;
@@ -68,11 +71,11 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   String? activityValue;
   String? countryName = 'Saudi Arabia';
   String? countryShortName;
-  String? countryId;
+  int countryId = 0;
   String? stateName;
-  String? stateId;
+  int? stateId;
   String? cityName;
-  String? cityId;
+  int? cityId;
   String? memberCategoryValue;
   String? memberCategoryId;
   String? quotation;
@@ -109,11 +112,20 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   Set<String> memberCategoryList = {};
   List<String> gpcList = [];
   Set<String> activities = {};
+  List<String> categories = [
+    "Non-Medical Category",
+    "Medical Category",
+    "Tobacco Category",
+    "Cosmetics Category",
+    "Pharma Category"
+  ];
 
   // models list
-  List<GetAllCountriesModel> countriesList = [];
+  List<GetCountriesModel> countriesList = [];
   List<GetAllStatesModel> statesList = [];
   List<ActivitiesModel> activitiesList = [];
+
+  String? selectedCategory;
 
   // arguments
   String? document;
@@ -124,6 +136,18 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   void initState() {
     // getAllOtherProducts();
     // getAllMemberCategories();
+    GetAllCountriesServices.getList().then((countries) {
+      countriesList = countries;
+      for (var element in countries) {
+        this.countries.add(element.nameEn.toString());
+      }
+      countryId = countriesList
+          .firstWhere((element) => element.nameEn == countryName,
+              orElse: () => GetCountriesModel(id: null))
+          .id!;
+    });
+
+    selectedCategory = categories[0];
     Future.delayed(Duration.zero, () {
       final arags = ModalRoute.of(context)?.settings.arguments as Map;
       crNumber = arags['cr_number'];
@@ -193,8 +217,9 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                          child: TabWidget(
-                              isNextClicked: isFirstClicked, title: "1")),
+                        child: TabWidget(
+                            isNextClicked: isFirstClicked, title: "1"),
+                      ),
                       Expanded(
                           child: TabWidget(
                               isNextClicked: isSecondClicked, title: "2")),
@@ -339,6 +364,20 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                               ],
                                             ),
                                       const SizedBox(height: 20),
+                                      const RequiredTextWidget(
+                                        title: "Select Category",
+                                      ),
+                                      5.heightBox,
+                                      DropdownWidget(
+                                        list: categories,
+                                        value: selectedCategory!,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedCategory = value;
+                                          });
+                                        },
+                                      ).box.make().wFull(context),
+                                      20.heightBox,
                                       const RequiredTextWidget(title: 'Email'),
                                       const SizedBox(height: 5),
                                       CustomTextField(
@@ -676,7 +715,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                       const SizedBox(height: 20),
                                       const Divider(thickness: 3),
                                       const RequiredTextWidget(
-                                          title: "Select Country"),
+                                        title: "Select Country",
+                                      ),
                                       FutureBuilder(
                                           future:
                                               GetAllCountriesServices.getList(),
@@ -685,9 +725,10 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                 ConnectionState.waiting) {
                                               return const Center(
                                                 child: SizedBox(
-                                                    height: 40,
-                                                    child:
-                                                        LinearProgressIndicator()),
+                                                  height: 40,
+                                                  child:
+                                                      LinearProgressIndicator(),
+                                                ),
                                               );
                                             }
                                             if (snapshot.hasError) {
@@ -697,7 +738,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                               );
                                             }
                                             final snap = snapshot.data
-                                                as List<GetAllCountriesModel>;
+                                                as List<GetCountriesModel>;
                                             countriesList = snap;
                                             countries.clear();
                                             for (var element in snap) {
@@ -719,7 +760,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                             DropdownMenuItem<
                                                                 String>(
                                                           value: v,
-                                                          child: Text(v),
+                                                          child:
+                                                              AutoSizeText(v),
                                                         ),
                                                       )
                                                       .toList(),
@@ -731,18 +773,16 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                       cityName = null;
                                                       cities.clear();
                                                       states.clear();
-                                                      countryShortName = (countriesList
+                                                      countryId = (snap
                                                           .firstWhere(
                                                               (element) =>
                                                                   element
                                                                       .nameEn ==
                                                                   countryName,
                                                               orElse: () =>
-                                                                  GetAllCountriesModel(
+                                                                  GetCountriesModel(
                                                                       id: null))
-                                                          .countryShortName);
-                                                      print(
-                                                          '****** : $countryShortName');
+                                                          .id!);
                                                     });
                                                   }),
                                             );
@@ -752,8 +792,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                           title: "Select State"),
 
                                       FutureBuilder(
-                                          future:
-                                              GetAllStatesServices.getList(),
+                                          future: GetAllStatesServices.getList(
+                                              countryId),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
@@ -765,31 +805,30 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                               );
                                             }
                                             if (snapshot.hasError) {
-                                              return const Center(
-                                                child: Text("Refresh the page"),
+                                              return Center(
+                                                child: Column(
+                                                  children: [
+                                                    const Text(
+                                                        "Something went wrong"),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        setState(() {});
+                                                      },
+                                                      child:
+                                                          const Text("Refresh"),
+                                                    ),
+                                                  ],
+                                                ),
                                               );
                                             }
                                             final snap = snapshot.data
                                                 as List<GetAllStatesModel>;
                                             statesList = snap;
-                                            countryId = (countriesList
-                                                .firstWhere(
-                                                    (element) =>
-                                                        element.nameEn ==
-                                                        countryName,
-                                                    orElse: () =>
-                                                        GetAllCountriesModel(
-                                                            id: null))
-                                                .id);
                                             states.clear();
 
                                             for (var element in snap) {
-                                              if (element.countryId
-                                                      .toString() ==
-                                                  countryId.toString()) {
-                                                states.add(
-                                                    element.name.toString());
-                                              }
+                                              states
+                                                  .add(element.name.toString());
                                             }
                                             return SizedBox(
                                               width: double.infinity,
@@ -815,6 +854,16 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                       stateName = newValue!;
                                                       cityName = null;
                                                       cities.clear();
+                                                      stateId = (snap
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element
+                                                                      .name ==
+                                                                  stateName,
+                                                              orElse: () =>
+                                                                  GetAllStatesModel(
+                                                                      id: null))
+                                                          .id!);
                                                     });
                                                   }),
                                             );
@@ -823,8 +872,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                       const RequiredTextWidget(
                                           title: "Select City"),
                                       FutureBuilder(
-                                          future:
-                                              GetAllCitiesServices.getData(),
+                                          future: GetAllCitiesServices.getData(
+                                              stateId ?? 0),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
@@ -844,26 +893,13 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                             }
                                             final snap = snapshot.data
                                                 as List<GetAllCitiesModel>;
-                                            stateId = (statesList
-                                                .firstWhere(
-                                                    (element) =>
-                                                        element.name ==
-                                                        stateName,
-                                                    orElse: () =>
-                                                        GetAllStatesModel(
-                                                            id: null))
-                                                .id);
-                                            print("state ID: ------ $stateId");
+
                                             states.clear();
 
                                             for (var element in snap) {
                                               // print(element.stateId);
-                                              if (element.stateId.toString() ==
-                                                  stateId.toString()) {
-                                                // print(element.name.toString());
-                                                cities.add(
-                                                    element.name.toString());
-                                              }
+                                              cities
+                                                  .add(element.name.toString());
                                             }
                                             return SizedBox(
                                               width: double.infinity,
@@ -1491,13 +1527,14 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                   website:
                                                       websiteController.text,
                                                   gpc: addedGPC.toList(),
-                                                  countryId: countryId,
+                                                  countryId:
+                                                      countryId.toString(),
                                                   countryName: countryName,
                                                   countryShortName:
                                                       countryShortName,
-                                                  stateId: stateId,
+                                                  stateId: stateId.toString(),
                                                   stateName: stateName,
-                                                  cityId: cityId,
+                                                  cityId: cityId.toString(),
                                                   cityName: cityName,
                                                   otherProduct:
                                                       addedProducts.toList(),
