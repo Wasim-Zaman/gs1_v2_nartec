@@ -1,4 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:hiring_task/constants/colors/app_colors.dart';
 
 class DropdownWidget extends StatefulWidget {
   String value;
@@ -24,7 +26,7 @@ class _DropdownWidgetState extends State<DropdownWidget> {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black38),
-        color: Colors.white,
+        color: AppColors.transparentColor,
         borderRadius: BorderRadius.circular(10.0),
       ),
       width: widget.width ?? MediaQuery.of(context).size.width * 0.9,
@@ -33,6 +35,7 @@ class _DropdownWidgetState extends State<DropdownWidget> {
       child: DropdownButtonFormField(
         // Initial Value
         value: widget.value,
+
         isDense: true,
         isExpanded: true,
         // Down Arrow Icon
@@ -42,7 +45,7 @@ class _DropdownWidgetState extends State<DropdownWidget> {
         items: widget.list.map((String items) {
           return DropdownMenuItem(
             value: items,
-            child: Text(items),
+            child: AutoSizeText(items),
           );
         }).toList(),
         onChanged: widget.onChanged as void Function(String?)?,

@@ -49,6 +49,17 @@ class _GetBarcodeScreenState extends State<GetBarcodeScreen> {
           "document": document,
         },
       );
+    } else if (document == null &&
+        hasCrNumber &&
+        _crNumberController.text.length == 10) {
+      Navigator.of(context).pushNamed(
+        MemberRegistrationScreen.routeName,
+        arguments: {
+          'cr_number': _crNumberController.text,
+          'hasCrNumber': hasCrNumber,
+          "document": document,
+        },
+      );
     }
   }
 

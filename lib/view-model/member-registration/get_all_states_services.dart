@@ -6,14 +6,22 @@ import 'package:http/http.dart' as http;
 
 class GetAllStatesServices {
   static List<GetAllStatesModel> futureData = [];
-  static Future<List<GetAllStatesModel>> getList() async {
-    const String url = '${BaseUrl.gs1WithPort}/api/GetAllStates';
-    final response = await http.get(Uri.parse(url));
+  static Future<List<GetAllStatesModel>> getList(int countryId) async {
+    const String url = '${BaseUrl.gs1}/api/states/by/country';
+    final response = await http.post(Uri.parse(url),
+        body: json.encode({
+          "country_id": countryId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        });
+
     if (response.statusCode == 200) {
-      final responseBody = json.decode(response.body) as List;
+      final responseBody = json.decode(response.body)['states'];
       for (var element in responseBody) {
         futureData.add(GetAllStatesModel.fromJson(element));
       }
+      print("*********************** ${futureData.length}");
       return futureData;
     } else {
       throw Exception('Failed to load data');

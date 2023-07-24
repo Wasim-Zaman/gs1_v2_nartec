@@ -13,14 +13,11 @@ import 'package:hiring_task/models/member-registration/activities_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_cities_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_countries.dart';
 import 'package:hiring_task/models/member-registration/get_all_states_model.dart';
-import 'package:hiring_task/models/member-registration/member_category_model.dart';
-import 'package:hiring_task/models/member-registration/other_products_model.dart';
 import 'package:hiring_task/view-model/member-registration/activities_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_cities_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_countries_services.dart';
-import 'package:hiring_task/view-model/member-registration/get_all_member_categories_service.dart';
-import 'package:hiring_task/view-model/member-registration/get_all_other_products_service.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_states_services.dart';
+import 'package:hiring_task/view-model/member-registration/get_products_by_category_services.dart';
 import 'package:hiring_task/view-model/member-registration/gpc_services.dart';
 import 'package:hiring_task/view/screens/home/home_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
@@ -108,8 +105,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   final Set<String> countries = {};
   final Set<String> states = {};
   final Set<String> cities = {};
-  Set<String> otherProductsList = {};
-  Set<String> memberCategoryList = {};
+  List<String> otherProductsList = [];
+  List<String> memberCategoryList = [];
   List<String> gpcList = [];
   Set<String> activities = {};
   List<String> categories = [
@@ -370,10 +367,31 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                       5.heightBox,
                                       DropdownWidget(
                                         list: categories,
-                                        value: selectedCategory!,
+                                        value: selectedCategory.toString(),
                                         onChanged: (value) {
                                           setState(() {
                                             selectedCategory = value;
+                                            GetProductsByCategoryServices
+                                                .getProductsByCategory(
+                                              selectedCategory.toString(),
+                                            ).then((value) {
+                                              memberCategoryList.clear();
+                                              otherProductsList.clear();
+                                              for (var element
+                                                  in value.gtinProducts!) {
+                                                memberCategoryList.add(
+                                                  element.productName
+                                                      .toString(),
+                                                );
+                                              }
+                                              for (var element
+                                                  in value.otherProducts!) {
+                                                otherProductsList.add(
+                                                  element.productName
+                                                      .toString(),
+                                                );
+                                              }
+                                            });
                                           });
                                         },
                                       ).box.make().wFull(context),
@@ -939,142 +957,152 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                       const SizedBox(height: 20),
                                       const SizedBox(height: 20),
                                       const RequiredTextWidget(title: "GTIN"),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: FutureBuilder(
-                                              future:
-                                                  GetAllMemberCategoriesService
-                                                      .getList(),
-                                              builder: (context, snapshot) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return const Center(
-                                                    child: SizedBox(
-                                                      height: 40,
-                                                      child:
-                                                          LinearProgressIndicator(),
-                                                    ),
-                                                  );
-                                                }
-                                                if (snapshot.hasError) {
-                                                  return const Center(
-                                                    child: Text(
-                                                      "Someting went wring, please refresh",
-                                                    ),
-                                                  );
-                                                }
-                                                final snap = snapshot.data
-                                                    as List<
-                                                        MemberCategoryModel>;
-                                                memberCategoryList.clear();
-                                                for (var element in snap) {
-                                                  memberCategoryList.add(element
-                                                      .memberCategoryDescription
-                                                      .toString());
-                                                }
-                                                return SizedBox(
-                                                  width: double.infinity,
-                                                  child: DropdownButton(
-                                                      value:
-                                                          memberCategoryValue,
-                                                      items: memberCategoryList
-                                                          .map<
-                                                              DropdownMenuItem<
-                                                                  String>>(
-                                                            (String v) =>
-                                                                DropdownMenuItem<
-                                                                    String>(
-                                                              value: v,
-                                                              child: FittedBox(
-                                                                child: Text(
-                                                                  v,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          )
-                                                          .toList(),
-                                                      onChanged:
-                                                          (String? newValue) {
-                                                        setState(() {
-                                                          memberCategoryValue =
-                                                              newValue!;
-                                                          quotation = (snap
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .memberCategoryDescription ==
-                                                                      memberCategoryValue,
-                                                                  orElse: () =>
-                                                                      MemberCategoryModel(
-                                                                          memberCategoryDescription:
-                                                                              null))
-                                                              .quotation);
-                                                          allowOtherProducts = (snap
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .memberCategoryDescription ==
-                                                                      memberCategoryValue,
-                                                                  orElse: () =>
-                                                                      MemberCategoryModel(
-                                                                          memberCategoryDescription:
-                                                                              null))
-                                                              .allowOtherProducts);
-                                                          memberCategory = (snap
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .memberCategoryDescription ==
-                                                                      memberCategoryValue,
-                                                                  orElse: () =>
-                                                                      MemberCategoryModel(
-                                                                          memberCategoryDescription:
-                                                                              null))
-                                                              .id);
+                                      // Row(
+                                      //   children: [
+                                      //     Expanded(
+                                      //       child: FutureBuilder(
+                                      //         future:
+                                      //             GetAllMemberCategoriesService
+                                      //                 .getList(),
+                                      //         builder: (context, snapshot) {
+                                      //           if (snapshot.connectionState ==
+                                      //               ConnectionState.waiting) {
+                                      //             return const Center(
+                                      //               child: SizedBox(
+                                      //                 height: 40,
+                                      //                 child:
+                                      //                     LinearProgressIndicator(),
+                                      //               ),
+                                      //             );
+                                      //           }
+                                      //           if (snapshot.hasError) {
+                                      //             return const Center(
+                                      //               child: Text(
+                                      //                 "Someting went wring, please refresh",
+                                      //               ),
+                                      //             );
+                                      //           }
+                                      //           final snap = snapshot.data
+                                      //               as List<
+                                      //                   MemberCategoryModel>;
+                                      //           memberCategoryList.clear();
+                                      //           for (var element in snap) {
+                                      //             memberCategoryList.add(element
+                                      //                 .memberCategoryDescription
+                                      //                 .toString());
+                                      //           }
+                                      //           return SizedBox(
+                                      //             width: double.infinity,
+                                      //             child: DropdownButton(
+                                      //                 value:
+                                      //                     memberCategoryValue,
+                                      //                 items: memberCategoryList
+                                      //                     .map<
+                                      //                         DropdownMenuItem<
+                                      //                             String>>(
+                                      //                       (String v) =>
+                                      //                           DropdownMenuItem<
+                                      //                               String>(
+                                      //                         value: v,
+                                      //                         child: FittedBox(
+                                      //                           child: Text(
+                                      //                             v,
+                                      //                           ),
+                                      //                         ),
+                                      //                       ),
+                                      //                     )
+                                      //                     .toList(),
+                                      //                 onChanged:
+                                      //                     (String? newValue) {
+                                      //                   setState(() {
+                                      //                     memberCategoryValue =
+                                      //                         newValue!;
+                                      //                     quotation = (snap
+                                      //                         .firstWhere(
+                                      //                             (element) =>
+                                      //                                 element
+                                      //                                     .memberCategoryDescription ==
+                                      //                                 memberCategoryValue,
+                                      //                             orElse: () =>
+                                      //                                 MemberCategoryModel(
+                                      //                                     memberCategoryDescription:
+                                      //                                         null))
+                                      //                         .quotation);
+                                      //                     allowOtherProducts = (snap
+                                      //                         .firstWhere(
+                                      //                             (element) =>
+                                      //                                 element
+                                      //                                     .memberCategoryDescription ==
+                                      //                                 memberCategoryValue,
+                                      //                             orElse: () =>
+                                      //                                 MemberCategoryModel(
+                                      //                                     memberCategoryDescription:
+                                      //                                         null))
+                                      //                         .allowOtherProducts);
+                                      //                     memberCategory = (snap
+                                      //                         .firstWhere(
+                                      //                             (element) =>
+                                      //                                 element
+                                      //                                     .memberCategoryDescription ==
+                                      //                                 memberCategoryValue,
+                                      //                             orElse: () =>
+                                      //                                 MemberCategoryModel(
+                                      //                                     memberCategoryDescription:
+                                      //                                         null))
+                                      //                         .id);
 
-                                                          memberRegistrationFee = (snap
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .memberCategoryDescription ==
-                                                                      memberCategoryValue,
-                                                                  orElse: () =>
-                                                                      MemberCategoryModel(
-                                                                          memberCategoryDescription:
-                                                                              null))
-                                                              .memberRegistrationFee);
+                                      //                     memberRegistrationFee = (snap
+                                      //                         .firstWhere(
+                                      //                             (element) =>
+                                      //                                 element
+                                      //                                     .memberCategoryDescription ==
+                                      //                                 memberCategoryValue,
+                                      //                             orElse: () =>
+                                      //                                 MemberCategoryModel(
+                                      //                                     memberCategoryDescription:
+                                      //                                         null))
+                                      //                         .memberRegistrationFee);
 
-                                                          gtinYearlySubscriptionFee = (snap
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .memberCategoryDescription ==
-                                                                      memberCategoryValue,
-                                                                  orElse: () =>
-                                                                      MemberCategoryModel(
-                                                                          memberCategoryDescription:
-                                                                              null))
-                                                              .gtinYearlySubscriptionFee);
+                                      //                     gtinYearlySubscriptionFee = (snap
+                                      //                         .firstWhere(
+                                      //                             (element) =>
+                                      //                                 element
+                                      //                                     .memberCategoryDescription ==
+                                      //                                 memberCategoryValue,
+                                      //                             orElse: () =>
+                                      //                                 MemberCategoryModel(
+                                      //                                     memberCategoryDescription:
+                                      //                                         null))
+                                      //                         .gtinYearlySubscriptionFee);
 
-                                                          gcpType = (snap
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .memberCategoryDescription ==
-                                                                      memberCategoryValue,
-                                                                  orElse: () =>
-                                                                      MemberCategoryModel(
-                                                                          memberCategoryDescription:
-                                                                              null))
-                                                              .gcpType);
-                                                        });
-                                                      }),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
+                                      //                     gcpType = (snap
+                                      //                         .firstWhere(
+                                      //                             (element) =>
+                                      //                                 element
+                                      //                                     .memberCategoryDescription ==
+                                      //                                 memberCategoryValue,
+                                      //                             orElse: () =>
+                                      //                                 MemberCategoryModel(
+                                      //                                     memberCategoryDescription:
+                                      //                                         null))
+                                      //                         .gcpType);
+                                      //                   });
+                                      //                 }),
+                                      //           );
+                                      //         },
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      DropdownWidget(
+                                        value: memberCategoryValue ??
+                                            memberCategoryList[0],
+                                        list: memberCategoryList,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            memberCategory = value;
+                                          });
+                                        },
                                       ),
                                       const SizedBox(height: 20),
 
@@ -1154,103 +1182,114 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                         },
                                                       )
                                                     : const SizedBox(),
-                                                FutureBuilder(
-                                                  future:
-                                                      GetAllOtherProductsService
-                                                          .getList(),
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot
-                                                            .connectionState ==
-                                                        ConnectionState
-                                                            .waiting) {
-                                                      return const Center(
-                                                        child: SizedBox(
-                                                          height: 40,
-                                                          child:
-                                                              LinearProgressIndicator(),
-                                                        ),
-                                                      );
-                                                    }
-                                                    if (snapshot.hasError) {
-                                                      return const Center(
-                                                        child: Text(
-                                                          "Someting went wring, please refresh",
-                                                        ),
-                                                      );
-                                                    }
-
-                                                    final snap = snapshot.data
-                                                        as List<
-                                                            OtherProductsModel>;
-                                                    otherProductsList.clear();
-                                                    for (var element in snap) {
-                                                      otherProductsList.add(
-                                                          element.productName
-                                                              .toString());
-                                                    }
-                                                    return SizedBox(
-                                                      height: 40,
-                                                      width: double.infinity,
-                                                      child: DropdownButton(
-                                                          isExpanded: true,
-                                                          value:
-                                                              otherProductsValue,
-                                                          items:
-                                                              otherProductsList
-                                                                  .map<
-                                                                      DropdownMenuItem<
-                                                                          String>>(
-                                                                    (String v) =>
-                                                                        DropdownMenuItem<
-                                                                            String>(
-                                                                      value: v,
-                                                                      child:
-                                                                          Text(
-                                                                              v),
-                                                                    ),
-                                                                  )
-                                                                  .toList(),
-                                                          onChanged: (String?
-                                                              newValue) {
-                                                            setState(() {
-                                                              otherProductsValue =
-                                                                  newValue!;
-                                                              addedProducts.add(
-                                                                  newValue);
-                                                              print(
-                                                                  addedProducts);
-                                                              final id = (snap
-                                                                  .firstWhere(
-                                                                      (element) =>
-                                                                          element
-                                                                              .productName ==
-                                                                          otherProductsValue,
-                                                                      orElse: () =>
-                                                                          OtherProductsModel(
-                                                                              productName: null))
-                                                                  .id);
-                                                              otherProductsId
-                                                                  .add(id!);
-                                                              print(
-                                                                  otherProductsId);
-                                                              final otherProdYearlyFee =
-                                                                  (snap
-                                                                      .firstWhere(
-                                                                        (element) =>
-                                                                            element.productName ==
-                                                                            otherProductsValue,
-                                                                        orElse: () =>
-                                                                            OtherProductsModel(productName: null),
-                                                                      )
-                                                                      .productSubscriptionFee);
-                                                              otherProductsYearlyFee
-                                                                  .add(
-                                                                      otherProdYearlyFee!);
-                                                            });
-                                                          }),
-                                                    );
+                                                DropdownWidget(
+                                                  value: otherProductsValue ??
+                                                      otherProductsList[0],
+                                                  list: otherProductsList,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      otherProductsValue =
+                                                          value;
+                                                    });
                                                   },
                                                 ),
+                                                // FutureBuilder(
+                                                //   future:
+                                                //       GetAllOtherProductsService
+                                                //           .getList(),
+                                                //   builder: (context, snapshot) {
+                                                //     if (snapshot
+                                                //             .connectionState ==
+                                                //         ConnectionState
+                                                //             .waiting) {
+                                                //       return const Center(
+                                                //         child: SizedBox(
+                                                //           height: 40,
+                                                //           child:
+                                                //               LinearProgressIndicator(),
+                                                //         ),
+                                                //       );
+                                                //     }
+                                                //     if (snapshot.hasError) {
+                                                //       return const Center(
+                                                //         child: Text(
+                                                //           "Someting went wring, please refresh",
+                                                //         ),
+                                                //       );
+                                                //     }
+
+                                                //     final snap = snapshot.data
+                                                //         as List<
+                                                //             OtherProductsModel>;
+                                                //     otherProductsList.clear();
+                                                //     for (var element in snap) {
+                                                //       otherProductsList.add(
+                                                //           element.productName
+                                                //               .toString());
+                                                //     }
+                                                //     return SizedBox(
+                                                //       height: 40,
+                                                //       width: double.infinity,
+                                                //       child: DropdownButton(
+                                                //           isExpanded: true,
+                                                //           value:
+                                                //               otherProductsValue,
+                                                //           items:
+                                                //               otherProductsList
+                                                //                   .map<
+                                                //                       DropdownMenuItem<
+                                                //                           String>>(
+                                                //                     (String v) =>
+                                                //                         DropdownMenuItem<
+                                                //                             String>(
+                                                //                       value: v,
+                                                //                       child:
+                                                //                           Text(
+                                                //                               v),
+                                                //                     ),
+                                                //                   )
+                                                //                   .toList(),
+                                                //           onChanged: (String?
+                                                //               newValue) {
+                                                //             setState(() {
+                                                //               otherProductsValue =
+                                                //                   newValue!;
+                                                //               addedProducts.add(
+                                                //                   newValue);
+                                                //               print(
+                                                //                   addedProducts);
+                                                //               final id = (snap
+                                                //                   .firstWhere(
+                                                //                       (element) =>
+                                                //                           element
+                                                //                               .productName ==
+                                                //                           otherProductsValue,
+                                                //                       orElse: () =>
+                                                //                           OtherProductsModel(
+                                                //                               productName: null))
+                                                //                   .id);
+                                                //               otherProductsId
+                                                //                   .add(id!);
+                                                //               print(
+                                                //                   otherProductsId);
+                                                //               final otherProdYearlyFee =
+                                                //                   (snap
+                                                //                       .firstWhere(
+                                                //                         (element) =>
+                                                //                             element.productName ==
+                                                //                             otherProductsValue,
+                                                //                         orElse: () =>
+                                                //                             OtherProductsModel(productName: null),
+                                                //                       )
+                                                //                       .productSubscriptionFee);
+                                                //               otherProductsYearlyFee
+                                                //                   .add(
+                                                //                       otherProdYearlyFee!);
+                                                //             });
+                                                //           }),
+                                                //     );
+                                                //   },
+                                                // ),
                                               ],
                                             ),
                                       const RequiredTextWidget(
@@ -1824,7 +1863,6 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
         });
       }
     } catch (error) {
-      print("********** Error: $error");
       setState(() {
         isSubmit = false;
       });
@@ -2051,20 +2089,6 @@ class _FileUploaderWidgetState extends State<FileUploaderWidget> {
       });
     }
   }
-
-  // void _uploadFile() async {
-  //   if (_selectedFile != null) {
-  //     final uri = Uri.parse('https://example.com/api/upload');
-  //     final request = http.MultipartRequest('POST', uri)
-  //       ..files.add(await http.MultipartFile.fromPath('file', _selectedFile!.path));
-  //     final response = await request.send();
-  //     if (response.statusCode == 200) {
-  //       // Handle success
-  //     } else {
-  //       // Handle error
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {

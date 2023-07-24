@@ -6,11 +6,18 @@ import 'package:http/http.dart' as http;
 
 class GetAllCitiesServices {
   static List<GetAllCitiesModel> futureData = [];
-  static Future<List<GetAllCitiesModel>> getData() async {
-    const String url = '${BaseUrl.gs1WithPort}/api/GetAllCities';
-    final response = await http.get(Uri.parse(url));
+  static Future<List<GetAllCitiesModel>> getData(int stateId) async {
+    const String url = '${BaseUrl.gs1}/api/cities/by/state';
+    final response = await http.post(Uri.parse(url),
+        body: json.encode({
+          "state_id": stateId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        });
+    print("********************* state id: ${response.body}");
     if (response.statusCode == 200) {
-      final responseBody = json.decode(response.body) as List;
+      final responseBody = json.decode(response.body)['city'] as List;
       for (var element in responseBody) {
         futureData.add(GetAllCitiesModel.fromJson(element));
       }

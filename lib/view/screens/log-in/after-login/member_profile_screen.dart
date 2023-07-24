@@ -10,6 +10,7 @@ import 'package:hiring_task/models/login-models/profile/member_profile_model.dar
 import 'package:hiring_task/res/common/common.dart';
 import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/view-model/login/after-login/profile/member_profile_services.dart';
+import 'package:hiring_task/view-model/login/after-login/validate_cr_services.dart';
 import 'package:hiring_task/view/screens/log-in/widgets/text_widgets/primary_text_widget.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
 import 'package:hiring_task/widgets/buttons/primary_button_widget.dart';
@@ -185,6 +186,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? addressImageFileName;
 
   String? img, addImg;
+
+  bool isValidate = false;
 
   // scaffold key
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -773,11 +776,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               CustomTextField(
                                 hintText: "CR Number",
                                 controller: crNumberController,
-                                readOnly: true,
+                                readOnly: false,
                               ),
                               const SizedBox(height: 10),
                               PrimaryButtonWidget(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  // call api to validate cr number
+                                  if (crNumberController.text.trim().isEmpty) {
+                                    Common.showToast("Please enter CR Number");
+                                    return;
+                                  }
+                                  AppDialogs.loadingDialog(context);
+                                  isValidate =
+                                      await ValidateCrServices.validateCr(
+                                          crNumberController.text);
+                                  if (isValidate) {
+                                    AppDialogs.closeDialog();
+                                    Common.showToast(
+                                        "CR Number is valided, you can now update",
+                                        backgroundColor: Colors.green);
+                                  } else {
+                                    AppDialogs.closeDialog();
+                                    Common.showToast(
+                                        "CR Number is not valid, please enter valid CR Number",
+                                        backgroundColor: Colors.red);
+                                  }
+                                },
                                 caption: "Validate CR Number",
                               ).box.make().wFull(context),
                               const SizedBox(height: 10),
@@ -873,9 +897,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () async {
-              AppDialogs.loadingDialog(context);
-              await update(context);
-              AppDialogs.closeDialog();
+              if (isValidate) {
+                AppDialogs.loadingDialog(context);
+                await update(context);
+                AppDialogs.closeDialog();
+              } else {
+                Common.showToast("Please validate CR Number");
+              }
             },
             label: const Text('Update'),
             icon: const Icon(Icons.update),

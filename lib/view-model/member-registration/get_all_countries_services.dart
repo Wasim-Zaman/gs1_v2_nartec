@@ -5,15 +5,15 @@ import 'package:hiring_task/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class GetAllCountriesServices {
-  static List<GetAllCountriesModel> futureData = [];
-  static Future<List<GetAllCountriesModel>> getList() async {
-    const String url = '${BaseUrl.gs1WithPort}/api/GetAllCountry';
+  static List<GetCountriesModel> futureData = [];
+  static Future<List<GetCountriesModel>> getList() async {
+    const String url = '${BaseUrl.gs1}/api/countries/list';
     final response = await http.get(Uri.parse(url));
-
+    print('response: ${response.body}');
     if (response.statusCode == 200) {
-      final responseBody = json.decode(response.body) as List;
+      final responseBody = json.decode(response.body)['countries'] as List;
       for (var element in responseBody) {
-        futureData.add(GetAllCountriesModel.fromJson(element));
+        futureData.add(GetCountriesModel.fromJson(element));
       }
       return futureData;
     } else {
