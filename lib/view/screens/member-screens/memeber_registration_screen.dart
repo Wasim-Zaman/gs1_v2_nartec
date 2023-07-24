@@ -133,6 +133,22 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   void initState() {
     // getAllOtherProducts();
     // getAllMemberCategories();
+    GetProductsByCategoryServices.getProductsByCategory(
+      selectedCategory ?? categories[0],
+    ).then((value) {
+      memberCategoryList.clear();
+      otherProductsList.clear();
+      for (var element in value.gtinProducts!) {
+        memberCategoryList.add(
+          element.productName.toString(),
+        );
+      }
+      for (var element in value.otherProducts!) {
+        otherProductsList.add(
+          element.productName.toString(),
+        );
+      }
+    });
     GetAllCountriesServices.getList().then((countries) {
       countriesList = countries;
       for (var element in countries) {
@@ -361,41 +377,6 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                               ],
                                             ),
                                       const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                        title: "Select Category",
-                                      ),
-                                      5.heightBox,
-                                      DropdownWidget(
-                                        list: categories,
-                                        value: selectedCategory.toString(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedCategory = value;
-                                            GetProductsByCategoryServices
-                                                .getProductsByCategory(
-                                              selectedCategory.toString(),
-                                            ).then((value) {
-                                              memberCategoryList.clear();
-                                              otherProductsList.clear();
-                                              for (var element
-                                                  in value.gtinProducts!) {
-                                                memberCategoryList.add(
-                                                  element.productName
-                                                      .toString(),
-                                                );
-                                              }
-                                              for (var element
-                                                  in value.otherProducts!) {
-                                                otherProductsList.add(
-                                                  element.productName
-                                                      .toString(),
-                                                );
-                                              }
-                                            });
-                                          });
-                                        },
-                                      ).box.make().wFull(context),
-                                      20.heightBox,
                                       const RequiredTextWidget(title: 'Email'),
                                       const SizedBox(height: 5),
                                       CustomTextField(
@@ -955,6 +936,41 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                             );
                                           }),
                                       const SizedBox(height: 20),
+                                      const RequiredTextWidget(
+                                        title: "Select Category",
+                                      ),
+                                      5.heightBox,
+                                      DropdownWidget(
+                                        list: categories,
+                                        value: selectedCategory.toString(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedCategory = value;
+                                            GetProductsByCategoryServices
+                                                .getProductsByCategory(
+                                              selectedCategory.toString(),
+                                            ).then((value) {
+                                              memberCategoryList.clear();
+                                              otherProductsList.clear();
+                                              for (var element
+                                                  in value.gtinProducts!) {
+                                                memberCategoryList.add(
+                                                  element.productName
+                                                      .toString(),
+                                                );
+                                              }
+                                              for (var element
+                                                  in value.otherProducts!) {
+                                                otherProductsList.add(
+                                                  element.productName
+                                                      .toString(),
+                                                );
+                                              }
+                                            });
+                                          });
+                                        },
+                                      ).box.make().wFull(context),
+
                                       const SizedBox(height: 20),
                                       const RequiredTextWidget(title: "GTIN"),
                                       // Row(
@@ -1103,7 +1119,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                             memberCategory = value;
                                           });
                                         },
-                                      ),
+                                      ).box.make().wFull(context),
                                       const SizedBox(height: 20),
 
                                       // const SizedBox(height: 20),
@@ -1192,7 +1208,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                           value;
                                                     });
                                                   },
-                                                ),
+                                                ).box.make().wFull(context),
                                                 // FutureBuilder(
                                                 //   future:
                                                 //       GetAllOtherProductsService
