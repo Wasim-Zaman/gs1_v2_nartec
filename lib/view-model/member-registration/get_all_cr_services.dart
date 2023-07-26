@@ -5,9 +5,9 @@ import 'package:hiring_task/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class GetAllCrServices {
-  static Future<List<GetAllCrModel>> getAllCr() async {
+  static Future<List<GetAllCrActivitiesModel>> getAllCr() async {
     const String url = '${BaseUrl.gs1WithPort}/api/GellAllCR';
-    List<GetAllCrModel> futureData = [];
+    List<GetAllCrActivitiesModel> futureData = [];
     print('GetAllCrServices: getAllCr: url: $url');
 
     try {
@@ -22,7 +22,7 @@ class GetAllCrServices {
         print('status code is fine');
         final responseBody = jsonDecode(response.body) as List;
         for (var element in responseBody) {
-          futureData.add(GetAllCrModel.fromJson(element));
+          futureData.add(GetAllCrActivitiesModel.fromJson(element));
         }
         return futureData;
       } else {

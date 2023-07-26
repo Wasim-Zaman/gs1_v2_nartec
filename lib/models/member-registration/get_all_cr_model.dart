@@ -1,36 +1,18 @@
-class GetAllCrModel {
-  String? id;
+class GetAllCrActivitiesModel {
   String? cr;
   String? activity;
-  int? status;
-  String? createdAt;
-  String? updatedAt;
 
-  GetAllCrModel(
-      {this.id,
-      this.cr,
-      this.activity,
-      this.status,
-      this.createdAt,
-      this.updatedAt});
+  GetAllCrActivitiesModel({this.cr, this.activity});
 
-  GetAllCrModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+  GetAllCrActivitiesModel.fromJson(Map<String, dynamic> json) {
     cr = json['cr'];
     activity = json['activity'];
-    status = json['status'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = id;
-    data['cr'] = cr;
-    data['activity'] = activity;
-    data['status'] = status;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+    data['cr'] = this.cr;
+    data['activity'] = this.activity;
     return data;
   }
 }

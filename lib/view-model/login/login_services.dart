@@ -65,9 +65,6 @@ class LoginServices {
       },
     ).then((response) {
       if (response.statusCode == 200) {
-        // handle successful response
-        print('******* status code is fine');
-        print('body: ${json.decode(response.body)}');
         final responseBody = json.decode(response.body) as Map<String, dynamic>;
         return responseBody;
       } else {
@@ -84,7 +81,6 @@ class LoginServices {
       uri,
       body: json.encode(
         {
-          // body should include email
           'email': email,
           'activity': activity,
           'password': password,
@@ -96,8 +92,6 @@ class LoginServices {
         'Host': BaseUrl.host,
       },
     ).then((response) {
-      print(response.statusCode);
-      print((response.body));
       if (response.statusCode == 200) {
         // handle successful response
         final responseBody = json.decode(response.body) as Map<String, dynamic>;

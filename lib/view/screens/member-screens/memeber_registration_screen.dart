@@ -9,9 +9,9 @@ import 'package:email_validator/email_validator.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hiring_task/models/member-registration/activities_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_cities_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_countries.dart';
+import 'package:hiring_task/models/member-registration/get_all_cr_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_states_model.dart';
 import 'package:hiring_task/view-model/member-registration/activities_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_cities_services.dart';
@@ -120,7 +120,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   // models list
   List<GetCountriesModel> countriesList = [];
   List<GetAllStatesModel> statesList = [];
-  List<ActivitiesModel> activitiesList = [];
+  List<GetAllCrActivitiesModel> activitiesList = [];
 
   String? selectedCategory;
 
@@ -319,7 +319,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                       }
                                                       final snap = snapshot.data
                                                           as List<
-                                                              ActivitiesModel>;
+                                                              GetAllCrActivitiesModel>;
                                                       activitiesList = snap;
                                                       for (var element
                                                           in activitiesList) {
@@ -970,7 +970,6 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                           });
                                         },
                                       ).box.make().wFull(context),
-
                                       const SizedBox(height: 20),
                                       const RequiredTextWidget(title: "GTIN"),
                                       // Row(
@@ -1527,7 +1526,6 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                             websiteController.text.isEmpty ||
                                             websiteController.text.length <=
                                                 9 ||
-                                            addedGPC.isEmpty ||
                                             countryName == null ||
                                             stateName == null ||
                                             cityName == null ||
@@ -1615,20 +1613,22 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                                   .length +
                                                               1, (index) {
                                                     if (index == 0) {
-                                                      return memberRegistrationFee!;
+                                                      return memberRegistrationFee ??
+                                                          0;
                                                     } else {
                                                       return 0;
                                                     }
                                                   }),
                                                   yearlyFee: [
-                                                    gtinYearlySubscriptionFee!,
+                                                    gtinYearlySubscriptionFee ??
+                                                        0,
                                                     ...otherProductsYearlyFee
                                                   ],
                                                   otherPrice:
                                                       otherProductsYearlyFee
                                                           .toList(),
                                                   product: [
-                                                    memberCategoryValue!,
+                                                    memberCategoryValue ?? "",
                                                     ...addedProducts.toList(),
                                                   ],
                                                   productType: addedProducts
@@ -1754,8 +1754,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
     request.fields['website'] = '$website';
 
     final gpcArray = jsonEncode(gpc);
-    request.fields['gpc'] =
-        gpcArray.toString().replaceAll('[', '').replaceAll(']', '');
+    request.fields['gpc'] = "10006233-Food Treatments";
+    // gpcArray.toString().replaceAll('[', '').replaceAll(']', '');
 
     request.fields['country_id'] = '$countryId';
     request.fields['countryName'] = '$countryName';

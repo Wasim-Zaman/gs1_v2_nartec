@@ -1,13 +1,14 @@
 import 'dart:convert';
 
-import 'package:hiring_task/models/member-registration/activities_model.dart';
+import 'package:hiring_task/models/member-registration/get_all_cr_model.dart';
 import 'package:hiring_task/utils/url.dart';
 import 'package:http/http.dart' as http;
 
 class ActivitiesService {
-  static List<ActivitiesModel> listOfActivities = [];
-  static Future<List<ActivitiesModel>> getActivities(String? cr_number) async {
-    const baseUrl = '${BaseUrl.gs1WithPort}/api/GellCRBYCRNO';
+  static List<GetAllCrActivitiesModel> listOfActivities = [];
+  static Future<List<GetAllCrActivitiesModel>> getActivities(
+      String? crNumber) async {
+    const baseUrl = '${BaseUrl.gs1}/api/cr/activities';
 
     final uri = Uri.parse(baseUrl);
 
@@ -15,27 +16,23 @@ class ActivitiesService {
       uri,
       body: json.encode(
         {
-          "crno": cr_number,
+          "cr_number": crNumber,
         },
       ),
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Host': BaseUrl.hostWithPort,
       },
     );
 
     if (response.statusCode == 200) {
       // handle successful response
-      final responseBody = json.decode(response.body) as List;
+      final responseBody = json.decode(response.body)['cr_activities'] as List;
       for (var element in responseBody) {
-        listOfActivities.add(ActivitiesModel.fromJson(element));
+        listOfActivities.add(GetAllCrActivitiesModel.fromJson(element));
       }
 
       return listOfActivities;
     } else {
-      print('Error happended while loading data');
-      // handle error response
       throw Exception('Error happended while loading data');
     }
   }
