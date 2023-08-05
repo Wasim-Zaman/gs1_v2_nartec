@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/login/login_services.dart';
 import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_one.dart';
@@ -38,22 +39,16 @@ class _Gs1MemberLoginScreenState extends State<Gs1MemberLoginScreen> {
 
   login() {
     if (formKey.currentState?.validate() ?? false) {
-      setState(() {
-        showSpinner = true;
-      });
-      LoginServices.getActivities(email: emailController.text).then((_) {
-        setState(() {
-          showSpinner = false;
-        });
+      AppDialogs.loadingDialog(context);
+      LoginServices.getActivities(email: emailController.text.trim()).then((_) {
+        AppDialogs.closeDialog();
         Navigator.pushNamed(
           context,
           SelectActivityAndPasswordScreen.routeName,
           arguments: emailController.text,
         );
       }).catchError((error) {
-        setState(() {
-          showSpinner = false;
-        });
+        AppDialogs.closeDialog();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(error.toString().replaceAll("Exception:", "")),

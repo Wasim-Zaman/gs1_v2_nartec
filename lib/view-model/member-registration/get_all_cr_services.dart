@@ -8,7 +8,6 @@ class GetAllCrServices {
   static Future<List<GetAllCrActivitiesModel>> getAllCr() async {
     const String url = '${BaseUrl.gs1WithPort}/api/GellAllCR';
     List<GetAllCrActivitiesModel> futureData = [];
-    print('GetAllCrServices: getAllCr: url: $url');
 
     try {
       final response = await http.get(
@@ -17,20 +16,16 @@ class GetAllCrServices {
           'Host': BaseUrl.hostWithPort,
         },
       );
-      if (response.statusCode == 200) // ok
-      {
-        print('status code is fine');
+      if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body) as List;
         for (var element in responseBody) {
           futureData.add(GetAllCrActivitiesModel.fromJson(element));
         }
         return futureData;
       } else {
-        print('status code is not fine');
         throw Exception('Status code is not fine');
       }
     } catch (error) {
-      print('error: $error');
       throw Exception('Failed to load data');
     }
   }

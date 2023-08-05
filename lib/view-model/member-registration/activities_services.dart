@@ -26,6 +26,7 @@ class ActivitiesService {
 
     if (response.statusCode == 200) {
       // handle successful response
+      print(response.body);
       final responseBody = json.decode(response.body)['cr_activities'] as List;
       for (var element in responseBody) {
         listOfActivities.add(GetAllCrActivitiesModel.fromJson(element));

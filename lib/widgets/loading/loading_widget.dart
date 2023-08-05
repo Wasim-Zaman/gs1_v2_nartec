@@ -7,7 +7,7 @@ class LoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: LoadingAnimationWidget.beat(
+      child: LoadingAnimationWidget.waveDots(
         color: AppColors.primaryColor,
         size: 50,
       ),

@@ -64,6 +64,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   // global key for the form
   GlobalKey formKey = GlobalKey<FormState>();
 
+  String? activityId;
+
   // for drop down lists
   String? activityValue;
   String? countryName = 'Saudi Arabia';
@@ -369,6 +371,14 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                                           () {
                                                                         activityValue =
                                                                             newValue;
+                                                                        activityId =
+                                                                            snap.firstWhere((element) {
+                                                                          return element.activity ==
+                                                                              newValue;
+                                                                        }).id;
+
+                                                                        print(
+                                                                            "activity id: $activityId");
                                                                       });
                                                                     }),
                                                               ),

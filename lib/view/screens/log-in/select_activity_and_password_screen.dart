@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/login/login_services.dart';
 import 'package:hiring_task/view/screens/log-in/otp_screen.dart';
@@ -162,9 +163,11 @@ class _SelectActivityAndPasswordScreenState
                     //   'Please Wait For Admin Approval',
                     //   backgroundColor: Colors.blue,
                     // );
+                    AppDialogs.loadingDialog(context);
                     LoginServices.loginWithPassword(
                             email, activityValue!, passwordController.text)
                         .then((value) {
+                      AppDialogs.closeDialog();
                       final message = value['message'] as String;
 
                       showOtpPopup(
@@ -174,6 +177,8 @@ class _SelectActivityAndPasswordScreenState
                         password: passwordController.text,
                       );
                     }).onError((error, stackTrace) {
+                      AppDialogs.closeDialog();
+
                       AwesomeDialog(
                         context: context,
                         dialogType: DialogType.warning,
@@ -186,6 +191,7 @@ class _SelectActivityAndPasswordScreenState
                       ).show();
                     });
                   } else {
+                    AppDialogs.closeDialog();
                     AwesomeDialog(
                       context: context,
                       dialogType: DialogType.error,
