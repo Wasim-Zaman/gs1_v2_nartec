@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hiring_task/res/common/common.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/login/login_services.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/dashboard/dashboard.dart';
@@ -26,17 +27,20 @@ class _OTPScreenState extends State<OTPScreen> {
   void initState() {
     formKey.currentState?.save();
     Future.delayed(Duration.zero, () async {
+      AppDialogs.loadingDialog(context);
       final args = ModalRoute.of(context)?.settings.arguments as Map;
       final email = args["email"];
       final activity = args["activity"];
 
       try {
         final response = await LoginServices.sendOTP(email, activity);
+        AppDialogs.closeDialog();
 
         Common.showToast(response["message"], backgroundColor: Colors.green);
         generatedOtp = response["otp"];
         otpController.text = response["otp"];
       } catch (e) {
+        AppDialogs.closeDialog();
         Common.showToast(e.toString(), backgroundColor: Colors.red);
         Future.delayed(const Duration(seconds: 2)).then((_) {
           Navigator.pop(context);
@@ -120,6 +124,7 @@ class _OTPScreenState extends State<OTPScreen> {
                         onPressed: () async {
                           if (formKey.currentState!.validate()) {
                             formKey.currentState!.save();
+                            AppDialogs.loadingDialog(context);
                             final args = ModalRoute.of(context)
                                 ?.settings
                                 .arguments as Map;
@@ -134,6 +139,7 @@ class _OTPScreenState extends State<OTPScreen> {
                                 generatedOtp.toString(),
                                 otpController.text,
                               );
+                              AppDialogs.closeDialog();
                               Common.showToast(
                                 response.message.toString(),
                                 backgroundColor: Colors.green,
@@ -147,6 +153,7 @@ class _OTPScreenState extends State<OTPScreen> {
                                 },
                               );
                             } catch (e) {
+                              AppDialogs.closeDialog();
                               Common.showToast(
                                 e.toString(),
                                 backgroundColor: Colors.red,
