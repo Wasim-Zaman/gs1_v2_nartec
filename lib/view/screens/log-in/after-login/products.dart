@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hiring_task/models/login-models/dashboard_model.dart';
 import 'package:hiring_task/view-model/login/after-login/products_services.dart';
 import 'package:hiring_task/widgets/custom_drawer_widget.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:hiring_task/widgets/loading/loading_widget.dart';
 
 class Products extends StatefulWidget {
   const Products({super.key});
@@ -36,7 +36,6 @@ class _ProductsState extends State<Products> {
       child: Scaffold(
         key: scaffoldKey,
         appBar: AppBar(
-          backgroundColor: Colors.blue,
           title: const Text('Manage Products'),
         ),
         drawer: CustomDrawerWidget(
@@ -47,19 +46,13 @@ class _ProductsState extends State<Products> {
           future: ProductsServices.getProducts(userId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: LoadingAnimationWidget.flickr(
-                  size: 60,
-                  leftDotColor: Colors.blue.shade600,
-                  rightDotColor: Colors.blue.shade800,
-                ),
-              );
+              return const LoadingWidget();
             }
             if (!snapshot.hasData) {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(
                       Icons.error_outline_sharp,
                       size: 100,
@@ -207,20 +200,27 @@ class _ProductsState extends State<Products> {
                             "$imagePath/${snap?[index].backImage}";
 
                         return Card(
-                          elevation: 6,
+                          elevation: 2,
                           child: ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Colors.blue,
                               radius: 30,
-                              child: Image.network(
+                              backgroundImage: NetworkImage(
                                 frontImage.toString(),
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Placeholder(
-                                  fallbackHeight: 30,
-                                  fallbackWidth: 30,
-                                ),
                               ),
+                              onBackgroundImageError: (exception, stackTrace) =>
+                                  const Placeholder(
+                                fallbackHeight: 30,
+                                fallbackWidth: 30,
+                              ),
+                              // child: Image.network(
+                              //   frontImage.toString(),
+                              //   fit: BoxFit.contain,
+                              //   errorBuilder: (context, error, stackTrace) =>
+                              //       const Placeholder(
+                              //     fallbackHeight: 30,
+                              //     fallbackWidth: 30,
+                              //   ),
+                              // ),
                             ),
                             title: Text(
                               productName.toString(),
@@ -259,7 +259,7 @@ class CustomBoxText extends StatelessWidget {
       height: 50,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.blue.shade400,
+        color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Center(

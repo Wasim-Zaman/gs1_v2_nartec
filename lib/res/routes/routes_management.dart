@@ -14,7 +14,6 @@ import 'package:hiring_task/view/screens/log-in/after-login/help_desk_screen.dar
 import 'package:hiring_task/view/screens/log-in/after-login/member_gln_screen.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/member_profile_screen.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/products.dart';
-import 'package:hiring_task/view/screens/log-in/after-login/renew_membership_screen.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/sscc_screen.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/subscribe_products_screen.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
@@ -94,8 +93,8 @@ class RoutesManagement {
       MemberProfileScreen.routeName: (context) => const MemberProfileScreen(),
       SubscribeProductsScreen.routeName: (context) =>
           const SubscribeProductsScreen(),
-      RenewMembershipScreen.routeName: (context) =>
-          const RenewMembershipScreen(),
+      // RenewMembershipScreen.routeName: (context) =>
+      //     const RenewMembershipScreen(),
       ResetScreenOne.routeName: (context) => const ResetScreenOne(),
       ResetScreenTwo.routeName: (context) => const ResetScreenTwo(),
       ResetScreenThree.routeName: (context) => const ResetScreenThree(),

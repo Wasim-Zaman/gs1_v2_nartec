@@ -13,6 +13,7 @@ import 'package:hiring_task/models/member-registration/get_all_cities_model.dart
 import 'package:hiring_task/models/member-registration/get_all_countries.dart';
 import 'package:hiring_task/models/member-registration/get_all_cr_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_states_model.dart';
+import 'package:hiring_task/models/member-registration/get_products_by_category_model.dart';
 import 'package:hiring_task/view-model/member-registration/activities_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_cities_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_countries_services.dart';
@@ -85,7 +86,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   String? otherProductsValue;
   String? gcpType;
   Set<String> otherProductsId = {};
-  Set<int> otherProductsYearlyFee = {};
+  Set<num> otherProductsYearlyFee = {};
   Set<String> addedProducts = {};
 
   // for files
@@ -123,8 +124,11 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   List<GetCountriesModel> countriesList = [];
   List<GetAllStatesModel> statesList = [];
   List<GetAllCrActivitiesModel> activitiesList = [];
+  GetProductsByCategoryModel productsByCategoryModel =
+      GetProductsByCategoryModel();
 
   String? selectedCategory;
+  String? selectedCategoryValue;
 
   // arguments
   String? document;
@@ -138,6 +142,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
     GetProductsByCategoryServices.getProductsByCategory(
       selectedCategory ?? categories[0],
     ).then((value) {
+      productsByCategoryModel = value;
       memberCategoryList.clear();
       otherProductsList.clear();
       for (var element in value.gtinProducts!) {
@@ -376,9 +381,6 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                                           return element.activity ==
                                                                               newValue;
                                                                         }).id;
-
-                                                                        print(
-                                                                            "activity id: $activityId");
                                                                       });
                                                                     }),
                                                               ),
@@ -679,8 +681,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                 temp.then((value) {
                                                   gpcList.clear();
                                                   for (var element in value) {
-                                                    gpcList
-                                                        .add(element.gpcTitle!);
+                                                    gpcList.add(element.value!);
                                                   }
                                                   ScaffoldMessenger.of(context)
                                                       .hideCurrentSnackBar();
@@ -956,6 +957,14 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                         onChanged: (value) {
                                           setState(() {
                                             selectedCategory = value;
+                                            if (selectedCategory ==
+                                                "Non-Medical Category") {
+                                              selectedCategoryValue =
+                                                  "non_med_category";
+                                            } else {
+                                              selectedCategoryValue =
+                                                  "med_category";
+                                            }
                                             GetProductsByCategoryServices
                                                 .getProductsByCategory(
                                               selectedCategory.toString(),
@@ -1185,6 +1194,9 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                                             addedProducts.remove(
                                                                               addedProducts.elementAt(index),
                                                                             );
+                                                                            otherProductsId.remove(
+                                                                              otherProductsId.elementAt(index),
+                                                                            );
                                                                           }),
                                                                       icon:
                                                                           const Icon(
@@ -1215,13 +1227,51 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                     setState(() {
                                                       otherProductsValue =
                                                           value;
+
+                                                      addedProducts.add(
+                                                          otherProductsValue!);
+
+                                                      final id =
+                                                          productsByCategoryModel
+                                                              .otherProducts!
+                                                              .firstWhere(
+                                                                  (element) =>
+                                                                      element
+                                                                          .productName ==
+                                                                      value)
+                                                              .otherProdID;
+
+                                                      otherProductsId
+                                                          .add(id.toString());
+                                                      print(otherProductsId);
+
+                                                      for (var element
+                                                          in productsByCategoryModel
+                                                              .otherProducts!) {
+                                                        if (element
+                                                                .productName ==
+                                                            value) {
+                                                          var yearly_fee = num
+                                                              .tryParse(element
+                                                                  .yearlyFee!);
+                                                          print(yearly_fee);
+
+                                                          otherProductsYearlyFee
+                                                              .add(yearly_fee!);
+                                                        }
+                                                      }
+                                                      print(
+                                                          otherProductsYearlyFee);
                                                     });
                                                   },
                                                 ).box.make().wFull(context),
                                                 // FutureBuilder(
                                                 //   future:
-                                                //       GetAllOtherProductsService
-                                                //           .getList(),
+                                                //       GetProductsByCategoryServices
+                                                //           .getProductsByCategory(
+                                                //     selectedCategory ??
+                                                //         categories[0],
+                                                //   ),
                                                 //   builder: (context, snapshot) {
                                                 //     if (snapshot
                                                 //             .connectionState ==
@@ -1243,15 +1293,15 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                 //       );
                                                 //     }
 
-                                                //     final snap = snapshot.data
-                                                //         as List<
-                                                //             OtherProductsModel>;
+                                                //     final snap = snapshot.data!;
+
                                                 //     otherProductsList.clear();
-                                                //     for (var element in snap) {
-                                                //       otherProductsList.add(
-                                                //           element.productName
-                                                //               .toString());
-                                                //     }
+                                                //     otherProductsList = snap
+                                                //         .otherProducts!
+                                                //         .map((e) =>
+                                                //             e.productName!)
+                                                //         .toList();
+
                                                 //     return SizedBox(
                                                 //       height: 40,
                                                 //       width: double.infinity,
@@ -1283,33 +1333,46 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                 //                   newValue);
                                                 //               print(
                                                 //                   addedProducts);
-                                                //               final id = (snap
+                                                //               int? id = snap
+                                                //                   .otherProducts!
                                                 //                   .firstWhere(
-                                                //                       (element) =>
-                                                //                           element
-                                                //                               .productName ==
-                                                //                           otherProductsValue,
-                                                //                       orElse: () =>
-                                                //                           OtherProductsModel(
-                                                //                               productName: null))
-                                                //                   .id);
-                                                //               otherProductsId
-                                                //                   .add(id!);
+                                                //                     (element) =>
+                                                //                         element
+                                                //                             .productName ==
+                                                //                         otherProductsValue,
+                                                //                     orElse:
+                                                //                         null,
+                                                //                   )
+                                                //                   .otherProdID;
+                                                //               id != null
+                                                //                   ? otherProductsId
+                                                //                       .add(id
+                                                //                           .toString())
+                                                //                   : null;
+
                                                 //               print(
                                                 //                   otherProductsId);
-                                                //               final otherProdYearlyFee =
+                                                //               String?
+                                                //                   otherProdYearlyFee =
                                                 //                   (snap
+                                                //                       .gtinProducts!
                                                 //                       .firstWhere(
                                                 //                         (element) =>
                                                 //                             element.productName ==
                                                 //                             otherProductsValue,
-                                                //                         orElse: () =>
-                                                //                             OtherProductsModel(productName: null),
+                                                //                         orElse:
+                                                //                             null,
                                                 //                       )
-                                                //                       .productSubscriptionFee);
-                                                //               otherProductsYearlyFee
-                                                //                   .add(
-                                                //                       otherProdYearlyFee!);
+                                                //                       .yearlyFee);
+                                                //               otherProdYearlyFee !=
+                                                //                       null
+                                                //                   ? otherProductsYearlyFee.add(
+                                                //                       int.parse(
+                                                //                           otherProdYearlyFee))
+                                                //                   : null;
+
+                                                //               print(otherProductsYearlyFee
+                                                //                   .toString());
                                                 //             });
                                                 //           }),
                                                 //     );
@@ -1317,6 +1380,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                 // ),
                                               ],
                                             ),
+                                      const SizedBox(height: 20),
                                       const RequiredTextWidget(
                                           title: "Upload Company Documents"),
                                       Row(
@@ -1345,19 +1409,13 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                                       .toString()
                                                                       .length >
                                                                   15
-                                                              ? pdfFileName!
-                                                                      .substring(
-                                                                          0,
-                                                                          15) +
-                                                                  "...." +
+                                                              ? "${pdfFileName!.substring(0, 15)}....${pdfFileName!.substring(
                                                                   pdfFileName!
-                                                                      .substring(
-                                                                    pdfFileName!
-                                                                            .length -
-                                                                        4,
-                                                                    pdfFileName!
-                                                                        .length,
-                                                                  )
+                                                                          .length -
+                                                                      4,
+                                                                  pdfFileName!
+                                                                      .length,
+                                                                )}"
                                                               : pdfFileName!,
                                                           softWrap: true,
                                                           style:
@@ -1440,7 +1498,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                         horizontal: 30),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.center,
                                       children: [
                                         // bank transfer
                                         Column(
@@ -1472,43 +1530,43 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                             )
                                           ],
                                         ),
-                                        Column(
-                                          children: [
-                                            SizedBox(
-                                              width: 130,
-                                              height: 100,
-                                              child: Image.asset(
-                                                'assets/images/mada.png',
-                                                fit: BoxFit.fill,
-                                              ),
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Radio<PaymentGateway>(
-                                                  value: PaymentGateway.mada,
-                                                  groupValue: paymentValue,
-                                                  onChanged:
-                                                      (PaymentGateway? value) {
-                                                    setState(() {
-                                                      paymentValue = value!;
-                                                      if (paymentValue ==
-                                                          PaymentGateway.mada) {
-                                                        bankType =
-                                                            "visa_transfer";
-                                                      } else {
-                                                        bankType =
-                                                            "bank_transfer";
-                                                      }
-                                                    });
-                                                  },
-                                                ),
-                                                const Text('Mada'),
-                                              ],
-                                            )
-                                          ],
-                                        ),
+                                        // Column(
+                                        //   children: [
+                                        //     SizedBox(
+                                        //       width: 130,
+                                        //       height: 100,
+                                        //       child: Image.asset(
+                                        //         'assets/images/mada.png',
+                                        //         fit: BoxFit.fill,
+                                        //       ),
+                                        //     ),
+                                        //     Row(
+                                        //       mainAxisAlignment:
+                                        //           MainAxisAlignment.start,
+                                        //       children: [
+                                        //         Radio<PaymentGateway>(
+                                        //           value: PaymentGateway.mada,
+                                        //           groupValue: paymentValue,
+                                        //           onChanged:
+                                        //               (PaymentGateway? value) {
+                                        //             setState(() {
+                                        //               paymentValue = value!;
+                                        //               if (paymentValue ==
+                                        //                   PaymentGateway.mada) {
+                                        //                 bankType =
+                                        //                     "visa_transfer";
+                                        //               } else {
+                                        //                 bankType =
+                                        //                     "bank_transfer";
+                                        //               }
+                                        //             });
+                                        //           },
+                                        //         ),
+                                        //         const Text('Mada'),
+                                        //       ],
+                                        //     )
+                                        //   ],
+                                        // ),
                                       ],
                                     ),
                                   ),
@@ -1559,6 +1617,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                           isSubmit
                                               ? () {}
                                               : submit(
+                                                  selectedCategoryValue:
+                                                      selectedCategoryValue,
                                                   gcpType: gcpType,
                                                   memberCategory:
                                                       memberCategory,
@@ -1716,19 +1776,20 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
     List<String>? otherProduct, // member category product
     List<String>? product, // member category product
     List<String>? quotation,
-    List<int>? registationFee,
-    List<int>? yearlyFee,
+    List<num>? registationFee,
+    List<num>? yearlyFee,
     String? gcpType,
     List<String>? productType,
-    List<int>? otherPrice,
+    List<num>? otherPrice,
     List<String>? otherProductId,
     String? paymentType,
+    String? selectedCategoryValue,
   }) async {
     setState(() {
       isSubmit = true;
     });
     final gtinPrice = registationFee![0] + yearlyFee![0];
-    int totalPrice = 0;
+    num totalPrice = 0;
     otherPrice?.forEach((element) {
       totalPrice += element;
     });
@@ -1762,10 +1823,11 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
     request.fields['mbl_extension'] = '$mobileExtension';
     request.fields['zip_code'] = '$zipCode';
     request.fields['website'] = '$website';
+    request.fields['gtin_category'] = "$selectedCategoryValue";
 
     final gpcArray = jsonEncode(gpc);
-    request.fields['gpc'] = "10006233-Food Treatments";
-    // gpcArray.toString().replaceAll('[', '').replaceAll(']', '');
+    request.fields['gpc'] =
+        gpcArray.toString().replaceAll('[', '').replaceAll(']', '');
 
     request.fields['country_id'] = '$countryId';
     request.fields['countryName'] = '$countryName';

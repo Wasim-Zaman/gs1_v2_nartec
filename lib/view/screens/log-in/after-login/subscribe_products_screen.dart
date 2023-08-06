@@ -479,12 +479,10 @@ class _GtinSubscriptionState extends State<GtinSubscription> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(
-                        RenewMembershipScreen.routeName,
-                        arguments: {
-                          'response': widget.response,
-                          'user_id': widget.userId,
-                        },
+                      context.push(
+                        (context) => RenewMembershipScreen(
+                            subscriptionModel: widget.response,
+                            userId: widget.userId),
                       );
                     },
                     style: ElevatedButton.styleFrom(

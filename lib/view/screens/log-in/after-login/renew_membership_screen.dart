@@ -5,7 +5,10 @@ import 'package:hiring_task/view-model/login/after-login/renewal_services.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
 
 class RenewMembershipScreen extends StatefulWidget {
-  const RenewMembershipScreen({super.key});
+  final SubscritionModel subscriptionModel;
+  final String userId;
+  const RenewMembershipScreen(
+      {super.key, required this.subscriptionModel, required this.userId});
   static const String routeName = '/renew-membership-screen';
 
   @override
@@ -45,7 +48,7 @@ class _RenewMembershipScreenState extends State<RenewMembershipScreen> {
       Navigator.of(context).pop();
     }).catchError((e) {
       Common.showToast(
-        'Renewal Failed',
+        "Something went wrong, please try again later",
         backgroundColor: Colors.red,
       );
     });
@@ -53,10 +56,8 @@ class _RenewMembershipScreenState extends State<RenewMembershipScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    subscriptionModel = args['response'] as SubscritionModel;
-    userId = args['user_id'] as String;
+    subscriptionModel = widget.subscriptionModel;
+    userId = widget.userId;
 
     final int expiryYear = int.parse(
         subscriptionModel.gtinSubscription?.expiry?.substring(0, 4) ?? '0');

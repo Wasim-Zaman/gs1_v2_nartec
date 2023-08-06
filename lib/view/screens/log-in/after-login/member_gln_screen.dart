@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hiring_task/models/login-models/dashboard_model.dart';
 import 'package:hiring_task/view-model/login/after-login/gln_services.dart';
+import 'package:hiring_task/view/screens/log-in/widgets/text_widgets/table_header_text.dart';
 import 'package:hiring_task/widgets/custom_drawer_widget.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:hiring_task/widgets/loading/loading_widget.dart';
 
 class MemberGLNScreen extends StatefulWidget {
   const MemberGLNScreen({super.key});
@@ -40,25 +41,19 @@ class _MemberGLNScreenState extends State<MemberGLNScreen> {
         ),
         appBar: AppBar(
           title: const Text("Member GLN"),
-          backgroundColor: Colors.deepPurple,
           elevation: 0,
         ),
         body: FutureBuilder(
           future: GLNServices.getGLN(userId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: LoadingAnimationWidget.horizontalRotatingDots(
-                  color: Colors.deepPurple,
-                  size: 60,
-                ),
-              );
+              return const LoadingWidget();
             }
             if (!snapshot.hasData) {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(
                       Icons.error_outline_sharp,
                       size: 100,
@@ -88,90 +83,76 @@ class _MemberGLNScreenState extends State<MemberGLNScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  Table(
-                    // border: TableBorder.symmetric(
-                    //   inside: const BorderSide(
-                    //     width: 1,
-                    //     color: Colors.white,
-                    //   ),
-                    // ),
-                    children: [
-                      TableRow(
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple.shade300,
-                        ),
-                        children: const [
-                          Text(
-                            'gcp_GLNID',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                  SizedBox(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: DataTable(
+                            dataRowColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.selected)) {
+                                  return Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.08);
+                                }
+                                return Colors.white;
+                              },
                             ),
-                          ),
-                          Text(
-                            'Location Name [Eng]',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              border: Border.all(color: Colors.grey, width: 1),
                             ),
-                          ),
-                          Text(
-                            'Location Name [Ar]',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'GLN Barcode',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // const SizedBox(height: 10),
-                  Expanded(
-                      child: ListView.builder(
-                    itemCount: snap?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      return Table(
-                        defaultVerticalAlignment:
-                            TableCellVerticalAlignment.top,
-                        // border: TableBorder.symmetric(
-                        //   inside: const BorderSide(
-                        //     width: 1,
-                        //     color: Colors.black,
-                        //   ),
-                        // ),
-                        children: [
-                          TableRow(
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: Colors.black,
-                                  width: 1,
-                                ),
-                                top: BorderSide(
-                                  color: Colors.black,
-                                  width: 1,
-                                ),
+                            dividerThickness: 2,
+                            border: const TableBorder(
+                              horizontalInside: BorderSide(
+                                color: Colors.grey,
+                                width: 2,
+                              ),
+                              verticalInside: BorderSide(
+                                color: Colors.grey,
+                                width: 2,
                               ),
                             ),
-                            children: [
-                              Text('${snap?[index].gcpGLNID}'),
-                              Text('${snap?[index].locationNameEn}'),
-                              Text('${snap?[index].locationNameAr}'),
-                              Text('${snap?[index].gLNBarcodeNumber}'),
+                            columns: const [
+                              DataColumn(
+                                label: TableHeaderText(text: 'gpc_GLNID'),
+                              ),
+                              DataColumn(
+                                label: TableHeaderText(
+                                    text: 'Location Name [Eng]'),
+                              ),
+                              DataColumn(
+                                label:
+                                    TableHeaderText(text: 'Location Name [Ar]'),
+                              ),
+                              DataColumn(
+                                label: TableHeaderText(text: 'GLN Barcode'),
+                              ),
                             ],
-                          ),
-                        ],
-                      );
-                    },
-                  ))
+                            rows: snap!.map<DataRow>((e) {
+                              return DataRow(
+                                cells: [
+                                  DataCell(
+                                    Text(e.gcpGLNID ?? ''),
+                                  ),
+                                  DataCell(
+                                    Text(e.locationNameEn ?? ''),
+                                  ),
+                                  DataCell(
+                                    Text(e.locationNameAr ?? ''),
+                                  ),
+                                  DataCell(
+                                    Text(e.gLNBarcodeNumber ?? ''),
+                                  ),
+                                ],
+                              );
+                            }).toList()),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             );

@@ -18,7 +18,8 @@ class RenewalServices {
 
     final otherPrice = otherSubscription?.map((e) => e.otherprice).toList();
     final yearlyFee = [...otherPrice!];
-    int? x = int.parse(subscritionModel.gtinSubscription!.gtinprice.toString());
+    double? x =
+        double.parse(subscritionModel.gtinSubscription!.gtinprice.toString());
     yearlyFee.insert(0, x.toString());
 
     final yearlyFeeMap = {};
@@ -46,46 +47,43 @@ class RenewalServices {
       yearlyFeeMap[i.toString()] = yearlyFee[i];
     }
 
-    try {
-      final http.Response response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Host': BaseUrl.host,
+    final http.Response response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Host': BaseUrl.host,
+      },
+      body: jsonEncode(
+        {
+          "payment_type": "bank_transfer",
+          "product": productsMap,
+          "registration_fee": regFeeMap,
+          "user_id": userId,
+          "renewGtinID": subscritionModel.gtinSubscription?.renewGtinID,
+          "request_type": "renew",
+          "quotation": quotationMap,
+          "product_type": List.generate(products.length, (index) {
+            if (index == 0) {
+              return 'gtin';
+            } else {
+              return 'other';
+            }
+          }),
+          "gtinprice": subscritionModel.gtinSubscription?.gtinprice,
+          "total_no_of_barcodes":
+              subscritionModel.gtinSubscription?.totalNoOfBarcodes,
+          "yearly_fee": yearlyFeeMap,
+          "otherProdID": otherProductIdMap,
+          "otherprice": otherPriceMap,
         },
-        body: jsonEncode(
-          {
-            "payment_type": "bank_transfer",
-            "product": productsMap,
-            "registration_fee": regFeeMap,
-            "user_id": userId,
-            "renewGtinID": subscritionModel.gtinSubscription?.renewGtinID,
-            "request_type": "renew",
-            "quotation": quotationMap,
-            "product_type": List.generate(products.length, (index) {
-              if (index == 0) {
-                return 'gtin';
-              } else {
-                return 'other';
-              }
-            }),
-            "gtinprice": subscritionModel.gtinSubscription?.gtinprice,
-            "total_no_of_barcodes":
-                subscritionModel.gtinSubscription?.totalNoOfBarcodes,
-            "yearly_fee": yearlyFeeMap,
-            "otherProdID": otherProductIdMap,
-            "otherprice": otherPriceMap,
-          },
-        ),
-      );
+      ),
+    );
 
-      if (response.statusCode == 200) {
-      } else {
-        throw Exception('Renewal Failed');
-      }
-    } catch (e) {
-      rethrow;
+    if (response.statusCode == 200) {
+    } else {
+      print("status code ${response.body}***&*&*&*&*&*&*&*W");
+      throw Exception('Renewal Failed');
     }
   }
 }
