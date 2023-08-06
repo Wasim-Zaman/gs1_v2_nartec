@@ -16,9 +16,9 @@ import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart'
 import 'package:hiring_task/widgets/buttons/primary_button_widget.dart';
 import 'package:hiring_task/widgets/custom_drawer_widget.dart';
 import 'package:hiring_task/widgets/images/image_widget.dart';
+import 'package:hiring_task/widgets/loading/loading_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class MemberProfileScreen extends StatefulWidget {
@@ -61,21 +61,25 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
           future: MemberProfileServices.getMemberProfile(userId!),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: LoadingAnimationWidget.discreteCircle(
-                  color: Theme.of(context).primaryColor,
-                  size: 100,
-                ),
-              );
+              return const LoadingWidget();
             }
             if (!snapshot.hasData) {
-              return Center(
-                child: ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.error),
-                    label: const Text("Refresh The Page")),
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 60,
+                    color: Colors.red,
+                  ),
+                  Text(snapshot.error.toString()),
+                  ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.refresh),
+                    label: const Text("Refresh The Page"),
+                  ),
+                ],
               );
             }
             if (snapshot.hasError) {
@@ -127,11 +131,15 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
           },
         ),
         bottomNavigationBar: BottomNavyBar(
-          animationDuration: const Duration(milliseconds: 300),
           selectedIndex: _selectedIndex,
           showElevation: true, // use this to remove appBar's elevation
           onItemSelected: (index) => setState(() {
             _selectedIndex = index;
+            if (_selectedIndex == 0) {
+              title = 'Member Details';
+            } else if (_selectedIndex == 1) {
+              title = 'Member Profile';
+            }
             pageController.animateToPage(index,
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.ease);
@@ -249,665 +257,648 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _scaffoldKey.currentState?.openDrawer();
         return Future.value(false);
       },
-      child: WillPopScope(
-        onWillPop: () async {
-          _scaffoldKey.currentState?.openDrawer();
-          return false;
-        },
-        child: Scaffold(
-          key: _scaffoldKey,
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                ExpansionPanelList.radio(
-                  animationDuration: const Duration(seconds: 1),
-                  children: [
-                    ExpansionPanelRadio(
-                      value: 1,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}image_section.png"),
-                          title: const Text(
-                            'Image',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Stack(
-                        fit: StackFit.loose,
-                        children: [
-                          imageFile?.path != null
-                              ? Image.file(
-                                  imageFile!,
-                                  width: 256,
-                                  height: 256,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.network(
-                                  img ?? "",
-                                  height: 256,
-                                  width: 256,
-                                  filterQuality: FilterQuality.high,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: LoadingAnimationWidget.flickr(
-                                        leftDotColor: Colors.pink.shade400,
-                                        rightDotColor: Colors.purple.shade400,
-                                        size: 50,
-                                      ),
-                                    );
-                                  },
-                                  // frameBuilder: (context, child, frame,
-                                  //         wasSynchronouslyLoaded) =>
-                                  //     LoadingAnimationWidget.threeArchedCircle(
-                                  //   color: Colors.pink,
-                                  //   size: 50,
-                                  // ),
-                                  cacheHeight: 256,
-                                  cacheWidth: 256,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Placeholder(
-                                    color: Colors.pink.shade400,
-                                    fallbackHeight: 256,
-                                    fallbackWidth: 256,
-                                  ),
-                                ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            left: 0,
-                            child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 30),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  ImagePicker()
-                                      .pickImage(source: ImageSource.gallery)
-                                      .then((value) {
-                                    if (value == null) return;
-                                    setState(() {
-                                      imageFile = File(value.path);
-                                      imageFileName =
-                                          value.path.split('/').last;
-                                    });
-                                  });
-                                },
-                                child: const Text('Choose Image'),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 2,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}company_details_section.png"),
-                          title: const Text('Company Details',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              )),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(
-                                  title: "Company Name [English]"),
-                              TextFormField(
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.companyNameEng,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(
-                                  title: "Company Name [Arabic]"),
-                              TextFormField(
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.companyNameArabic,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "Mobile"),
-                              TextFormField(
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget
-                                    .memberProfileModel?.memberProfile?.mobile,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "Extension"),
-                              TextFormField(
-                                enabled: true,
-                                controller: mobileExtensionController,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                            ],
+      child: Scaffold(
+        key: _scaffoldKey,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              ExpansionPanelList.radio(
+                animationDuration: const Duration(seconds: 1),
+                children: [
+                  ExpansionPanelRadio(
+                    value: 1,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}image_section.png"),
+                        title: const Text(
+                          'Image',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 3,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}country_details_section.png"),
-                          title: const Text(
-                            'Country Details',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(title: "County"),
-                              TextField(
-                                enabled: true,
-                                controller: countryNameController,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(
-                                  title: "Country Short Name"),
-                              TextFormField(
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.address?.countryShortName,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "State"),
-                              TextFormField(
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.address?.stateName,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "City"),
-                              TextFormField(
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.address?.cityName,
-                              ),
-                              const SizedBox(height: 10),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 4,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}country_zip_and_mobile_section.png"),
-                          title: const Text(
-                            'Country Zip, & Mobile',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(title: "Zip"),
-                              TextFormField(
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.address?.zip,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "Address Line 1"),
-                              TextFormField(
-                                enabled: true,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                initialValue: widget.memberProfileModel
-                                    ?.memberProfile?.address1,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(
-                                  title: "Other Mobile Number"),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: TextFormField(
-                                      decoration: InputDecoration(
-                                        prefixIcon: IconButton(
-                                          onPressed: () {
-                                            showCountryPicker(
-                                                context: context,
-                                                onSelect: (Country country) {
-                                                  otherMobileController.text =
-                                                      "+${country.phoneCode}";
-                                                });
-                                          },
-                                          icon: Icon(
-                                            Icons.flag_sharp,
-                                            size: 40,
-                                            color: Colors.green[900],
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      controller: otherMobileController,
-                                      keyboardType: TextInputType.number,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return "Please enter mobile number";
-                                        }
-                                        if (value.length < 13 ||
-                                            value.length > 13) {
-                                          return "Please enter valid mobile number";
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 5,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}other_details_section.png"),
-                          title: const Text(
-                            'Other Details',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(
-                                  title: "Other Landline Number"),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: TextFormField(
-                                      decoration: InputDecoration(
-                                        prefixIcon: IconButton(
-                                          onPressed: () {
-                                            showCountryPicker(
-                                                context: context,
-                                                onSelect: (Country country) {
-                                                  otherLandlineController.text =
-                                                      "+${country.phoneCode}";
-                                                });
-                                          },
-                                          icon: Icon(
-                                            Icons.flag_sharp,
-                                            size: 40,
-                                            color: Colors.green[900],
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      controller: otherLandlineController,
-                                      keyboardType: TextInputType.number,
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return "Please enter mobile number";
-                                        }
-                                        if (value.length < 13 ||
-                                            value.length > 13) {
-                                          return "Please enter valid mobile number";
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "District"),
-                              TextFormField(
-                                controller: districtController,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "Website"),
-                              CustomTextField(
-                                hintText: "Website",
-                                controller: websiteController,
+                      );
+                    },
+                    body: Stack(
+                      fit: StackFit.loose,
+                      children: [
+                        imageFile?.path != null
+                            ? Image.file(
+                                imageFile!,
+                                width: 256,
+                                height: 256,
+                                fit: BoxFit.cover,
                               )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 6,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}building_and_unit_section.png"),
-                          title: const Text(
-                            'Building & Unit',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(
-                                  title: "Building Number"),
-                              CustomTextField(
-                                hintText: "Building Number",
-                                controller: buildingNoController,
-                              ),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "Unit Number"),
-                              CustomTextField(
-                                hintText: "Unit Number",
-                                controller: unitNoController,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 7,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}qrcode_section.png"),
-                          title: const Text(
-                            'QR Code',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(title: "QR-Code Number"),
-                              CustomTextField(
-                                hintText: "QR-Code Number",
-                                controller: qrCodeNoController,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 8,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}company_id_section.png"),
-                          title: const Text(
-                            'Company ID',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(title: "Company Id"),
-                              CustomTextField(
-                                hintText: "Company Id",
-                                controller: companyIdController,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    ExpansionPanelRadio(
-                      value: 9,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          leading: Image.asset(
-                              "${AppIcons.membershipIconsBasePath}company_id_section.png"),
-                          title: const Text(
-                            'CR Number and Activities',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
-                      body: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const RequiredTextWidget(title: "CR Number"),
-                              CustomTextField(
-                                hintText: "CR Number",
-                                controller: crNumberController,
-                                readOnly: false,
-                              ),
-                              const SizedBox(height: 10),
-                              PrimaryButtonWidget(
-                                onPressed: () async {
-                                  // call api to validate cr number
-                                  if (crNumberController.text.trim().isEmpty) {
-                                    Common.showToast("Please enter CR Number");
-                                    return;
-                                  }
-                                  AppDialogs.loadingDialog(context);
-                                  isValidate =
-                                      await ValidateCrServices.validateCr(
-                                          crNumberController.text);
-                                  if (isValidate) {
-                                    AppDialogs.closeDialog();
-                                    Common.showToast(
-                                        "CR Number is valided, you can now update",
-                                        backgroundColor: Colors.green);
-                                  } else {
-                                    AppDialogs.closeDialog();
-                                    Common.showToast(
-                                        "CR Number is not valid, please enter valid CR Number",
-                                        backgroundColor: Colors.red);
-                                  }
+                            : Image.network(
+                                img ?? "",
+                                height: 256,
+                                width: 256,
+                                filterQuality: FilterQuality.high,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return const LoadingWidget();
                                 },
-                                caption: "Validate CR Number",
-                              ).box.make().wFull(context),
-                              const SizedBox(height: 10),
-                              const RequiredTextWidget(title: "Activities"),
-                              CustomTextField(
-                                hintText: "Activities",
-                                controller: activitiesController,
-                                readOnly: true,
+                                // frameBuilder: (context, child, frame,
+                                //         wasSynchronouslyLoaded) =>
+                                //     LoadingAnimationWidget.threeArchedCircle(
+                                //   color: Colors.pink,
+                                //   size: 50,
+                                // ),
+                                cacheHeight: 256,
+                                cacheWidth: 256,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Placeholder(
+                                  color: Colors.pink.shade400,
+                                  fallbackHeight: 256,
+                                  fallbackWidth: 256,
+                                ),
                               ),
-                            ],
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 30),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                ImagePicker()
+                                    .pickImage(source: ImageSource.gallery)
+                                    .then((value) {
+                                  if (value == null) return;
+                                  setState(() {
+                                    imageFile = File(value.path);
+                                    imageFileName = value.path.split('/').last;
+                                  });
+                                });
+                              },
+                              child: const Text('Choose Image'),
+                            ),
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 2,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}company_details_section.png"),
+                        title: const Text('Company Details',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            )),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(
+                                title: "Company Name [English]"),
+                            TextFormField(
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget.memberProfileModel
+                                  ?.memberProfile?.companyNameEng,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(
+                                title: "Company Name [Arabic]"),
+                            TextFormField(
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget.memberProfileModel
+                                  ?.memberProfile?.companyNameArabic,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "Mobile"),
+                            TextFormField(
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget
+                                  .memberProfileModel?.memberProfile?.mobile,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "Extension"),
+                            TextFormField(
+                              enabled: true,
+                              controller: mobileExtensionController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 3,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}country_details_section.png"),
+                        title: const Text(
+                          'Country Details',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(title: "County"),
+                            TextField(
+                              enabled: true,
+                              controller: countryNameController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(
+                                title: "Country Short Name"),
+                            TextFormField(
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget.memberProfileModel
+                                  ?.memberProfile?.address?.countryShortName,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "State"),
+                            TextFormField(
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget.memberProfileModel
+                                  ?.memberProfile?.address?.stateName,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "City"),
+                            TextFormField(
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget.memberProfileModel
+                                  ?.memberProfile?.address?.cityName,
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 4,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}country_zip_and_mobile_section.png"),
+                        title: const Text(
+                          'Country Zip, & Mobile',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(title: "Zip"),
+                            TextFormField(
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget.memberProfileModel
+                                  ?.memberProfile?.address?.zip,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "Address Line 1"),
+                            TextFormField(
+                              enabled: true,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              initialValue: widget
+                                  .memberProfileModel?.memberProfile?.address1,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(
+                                title: "Other Mobile Number"),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: TextFormField(
+                                    decoration: InputDecoration(
+                                      prefixIcon: IconButton(
+                                        onPressed: () {
+                                          showCountryPicker(
+                                              context: context,
+                                              onSelect: (Country country) {
+                                                otherMobileController.text =
+                                                    "+${country.phoneCode}";
+                                              });
+                                        },
+                                        icon: Icon(
+                                          Icons.flag_sharp,
+                                          size: 40,
+                                          color: Colors.green[900],
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    controller: otherMobileController,
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return "Please enter mobile number";
+                                      }
+                                      if (value.length < 13 ||
+                                          value.length > 13) {
+                                        return "Please enter valid mobile number";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 5,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}other_details_section.png"),
+                        title: const Text(
+                          'Other Details',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(
+                                title: "Other Landline Number"),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: TextFormField(
+                                    decoration: InputDecoration(
+                                      prefixIcon: IconButton(
+                                        onPressed: () {
+                                          showCountryPicker(
+                                              context: context,
+                                              onSelect: (Country country) {
+                                                otherLandlineController.text =
+                                                    "+${country.phoneCode}";
+                                              });
+                                        },
+                                        icon: Icon(
+                                          Icons.flag_sharp,
+                                          size: 40,
+                                          color: Colors.green[900],
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    controller: otherLandlineController,
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return "Please enter mobile number";
+                                      }
+                                      if (value.length < 13 ||
+                                          value.length > 13) {
+                                        return "Please enter valid mobile number";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "District"),
+                            TextFormField(
+                              controller: districtController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "Website"),
+                            CustomTextField(
+                              hintText: "Website",
+                              controller: websiteController,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 6,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}building_and_unit_section.png"),
+                        title: const Text(
+                          'Building & Unit',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(title: "Building Number"),
+                            CustomTextField(
+                              hintText: "Building Number",
+                              controller: buildingNoController,
+                            ),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "Unit Number"),
+                            CustomTextField(
+                              hintText: "Unit Number",
+                              controller: unitNoController,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 7,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}qrcode_section.png"),
+                        title: const Text(
+                          'QR Code',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(title: "QR-Code Number"),
+                            CustomTextField(
+                              hintText: "QR-Code Number",
+                              controller: qrCodeNoController,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 8,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}company_id_section.png"),
+                        title: const Text(
+                          'Company ID',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(title: "Company Id"),
+                            CustomTextField(
+                              hintText: "Company Id",
+                              controller: companyIdController,
+                              readOnly: true,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  ExpansionPanelRadio(
+                    value: 9,
+                    headerBuilder: (context, isExpanded) {
+                      return ListTile(
+                        leading: Image.asset(
+                            "${AppIcons.membershipIconsBasePath}company_id_section.png"),
+                        title: const Text(
+                          'CR Number and Activities',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                    body: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const RequiredTextWidget(title: "CR Number"),
+                            CustomTextField(
+                              hintText: "CR Number",
+                              controller: crNumberController,
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 10),
+                            PrimaryButtonWidget(
+                              onPressed: () async {
+                                // call api to validate cr number
+                                if (crNumberController.text.trim().isEmpty) {
+                                  Common.showToast("Please enter CR Number");
+                                  return;
+                                }
+                                AppDialogs.loadingDialog(context);
+                                isValidate =
+                                    await ValidateCrServices.validateCr(
+                                        crNumberController.text);
+                                if (isValidate) {
+                                  AppDialogs.closeDialog();
+                                  Common.showToast(
+                                      "CR Number is valided, you can now update",
+                                      backgroundColor: Colors.green);
+                                } else {
+                                  AppDialogs.closeDialog();
+                                  Common.showToast(
+                                      "CR Number is not valid, please enter valid CR Number",
+                                      backgroundColor: Colors.red);
+                                }
+                              },
+                              caption: "Validate CR Number",
+                            ).box.make().wFull(context),
+                            const SizedBox(height: 10),
+                            const RequiredTextWidget(title: "Activities"),
+                            CustomTextField(
+                              hintText: "Activities",
+                              controller: activitiesController,
+                              readOnly: true,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Card(
+                elevation: 3,
+                child: ListTile(
+                  onTap: () {
+                    // close the application
+                    FlutterExitApp.exitApp();
+                  },
+                  leading: Image.asset(
+                    "${AppIcons.membershipIconsBasePath}logout_section.png",
+                  ),
+                  title: const Text(
+                    "Log out",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 100,
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Address Photo',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    addressImageFile?.path != null
+                        ? Image.file(addressImageFile!)
+                        : Image.network(
+                            addImg ?? "",
+                            height: 80,
+                            width: 80,
+
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                              Icons.image_outlined,
+                              size: 80,
+                            ),
+                            cacheHeight: 80,
+                            cacheWidth: 80,
+                            // loadingBuilder: (context, child, loadingProgress) =>
+                            //     LoadingAnimationWidget.prograssiveDots(
+                            //   color: Colors.pink,
+                            //   size: 30,
+                            // ),
+                          ),
+                    TextButton(
+                      onPressed: () async {
+                        await ImagePicker()
+                            .pickImage(source: ImageSource.gallery)
+                            .then((value) {
+                          if (value == null) return;
+                          setState(() {
+                            addressImageFile = File(value.path);
+                            addressImageFileName = value.path.split('/').last;
+                          });
+                        });
+                      },
+                      child: const Text(
+                        'Upload',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ],
                 ),
-                Card(
-                  elevation: 3,
-                  child: ListTile(
-                    onTap: () {
-                      // close the application
-                      FlutterExitApp.exitApp();
-                    },
-                    leading: Image.asset(
-                      "${AppIcons.membershipIconsBasePath}logout_section.png",
-                    ),
-                    title: const Text(
-                      "Log out",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 100,
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Address Photo',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      addressImageFile?.path != null
-                          ? Image.file(addressImageFile!)
-                          : Image.network(
-                              addImg ?? "",
-                              height: 80,
-                              width: 80,
-
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                Icons.image_outlined,
-                                size: 80,
-                              ),
-                              cacheHeight: 80,
-                              cacheWidth: 80,
-                              // loadingBuilder: (context, child, loadingProgress) =>
-                              //     LoadingAnimationWidget.prograssiveDots(
-                              //   color: Colors.pink,
-                              //   size: 30,
-                              // ),
-                            ),
-                      TextButton(
-                        onPressed: () async {
-                          await ImagePicker()
-                              .pickImage(source: ImageSource.gallery)
-                              .then((value) {
-                            if (value == null) return;
-                            setState(() {
-                              addressImageFile = File(value.path);
-                              addressImageFileName = value.path.split('/').last;
-                            });
-                          });
-                        },
-                        child: const Text(
-                          'Upload',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () async {
-              if (isValidate) {
-                AppDialogs.loadingDialog(context);
-                await update(context);
-                AppDialogs.closeDialog();
-              } else {
-                Common.showToast("Please validate CR Number");
-              }
-            },
-            label: const Text('Update'),
-            icon: const Icon(Icons.update),
-          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            if (isValidate) {
+              AppDialogs.loadingDialog(context);
+              await update(context);
+              AppDialogs.closeDialog();
+            } else {
+              Common.showToast("Please validate CR Number");
+            }
+          },
+          label: const Text('Update'),
+          icon: const Icon(Icons.update),
         ),
       ),
     );
@@ -918,7 +909,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Common.showToast('Please select image');
       return;
     }
-    Common.showToast('Updating');
+    AppDialogs.loadingDialog(context);
     try {
       final int status = await MemberProfileServices.updateProfile(
         userId: widget.userId,
@@ -949,8 +940,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         unitNo: unitNoController.text,
       );
 
-      print("status : $status");
-
+      AppDialogs.closeDialog();
       if (status == 200) {
         Common.showToast(
           'Successfully Updated Profile',
@@ -963,13 +953,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
-      print(e.toString());
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
+      AppDialogs.closeDialog();
+      Common.showToast(
+        'Failed to Update Profile',
+        backgroundColor: Colors.red,
       );
     }
   }

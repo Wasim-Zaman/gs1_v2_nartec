@@ -7,7 +7,7 @@ import 'package:hiring_task/view-model/login/after-login/subscription_services.d
 import 'package:hiring_task/view/screens/log-in/after-login/renew_membership_screen.dart';
 import 'package:hiring_task/view/screens/log-in/widgets/text_widgets/table_header_text.dart';
 import 'package:hiring_task/widgets/custom_drawer_widget.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:hiring_task/widgets/loading/loading_widget.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class SubscribeProductsScreen extends StatefulWidget {
@@ -85,12 +85,7 @@ class _SubscribeProductsScreenState extends State<SubscribeProductsScreen> {
             future: SubscriptionServices.getSubscription(userId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: LoadingAnimationWidget.hexagonDots(
-                    color: Theme.of(context).primaryColor,
-                    size: 70,
-                  ),
-                );
+                return const LoadingWidget();
               }
               if (!snapshot.hasData) {
                 return Center(

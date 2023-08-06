@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hiring_task/providers/login_provider.dart';
 import 'package:hiring_task/res/common/common.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/view-model/login/login_services.dart';
 import 'package:hiring_task/view-model/login/reset-password/reset_password_services.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
@@ -179,7 +180,7 @@ class _ResetScreenOneState extends State<ResetScreenOne> {
                         },
                       );
                     } else {
-                      Common.showToast("Please wait...");
+                      AppDialogs.loadingDialog(context);
                       emailController.text =
                           Provider.of<LoginProvider>(context, listen: false)
                               .email
@@ -190,14 +191,26 @@ class _ResetScreenOneState extends State<ResetScreenOne> {
                               .toString();
                       try {
                         ResetPasswordServices.forgotPassword(
-                            emailController.text, activityValue.toString());
-                        Common.showToast(
-                          "Sent verification code to your email",
-                          backgroundColor: Theme.of(context).primaryColor,
-                        );
-                        Navigator.pushNamed(
-                          context,
-                          ResetScreenTwo.routeName,
+                                emailController.text, activityValue.toString())
+                            .then((value) {
+                          AppDialogs.closeDialog();
+                          Common.showToast(
+                            "Sent verification code to your email",
+                            backgroundColor: Theme.of(context).primaryColor,
+                          );
+                          Navigator.pushNamed(
+                            context,
+                            ResetScreenTwo.routeName,
+                          );
+                        }).catchError(
+                          (error) {
+                            AppDialogs.closeDialog();
+                            Common.showToast(
+                              error
+                                  .toString()
+                                  .replaceAll("Exception: ", "Error: "),
+                            );
+                          },
                         );
                       } catch (error) {
                         Common.showToast(

@@ -6,10 +6,10 @@ class MemberProfileModel {
 
   MemberProfileModel.fromJson(Map<String, dynamic> json) {
     memberProfile = json['memberProfile'] != null
-        ? new MemberProfile.fromJson(json['memberProfile'])
+        ? MemberProfile.fromJson(json['memberProfile'])
         : null;
     memberDetails = json['memberDetails'] != null
-        ? new MemberDetails.fromJson(json['memberDetails'])
+        ? MemberDetails.fromJson(json['memberDetails'])
         : null;
   }
 
@@ -73,7 +73,7 @@ class MemberProfile {
     mobile = json['mobile'];
     mblExtension = json['mbl_extension'];
     address =
-        json['address'] != null ? new Address.fromJson(json['address']) : null;
+        json['address'] != null ? Address.fromJson(json['address']) : null;
     address1 = json['address1'];
     additionalNumber = json['additional_number'];
     otherLandline = json['other_landline'];
