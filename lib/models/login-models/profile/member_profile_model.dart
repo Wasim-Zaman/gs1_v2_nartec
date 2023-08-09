@@ -119,7 +119,7 @@ class Address {
   String? cityName;
   String? stateName;
   String? zip;
-  Null? address;
+  String? address;
 
   Address(
       {this.countryName,

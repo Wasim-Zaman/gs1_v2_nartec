@@ -14,13 +14,14 @@ import 'package:hiring_task/models/member-registration/get_all_countries.dart';
 import 'package:hiring_task/models/member-registration/get_all_cr_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_states_model.dart';
 import 'package:hiring_task/models/member-registration/get_products_by_category_model.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
+import 'package:hiring_task/utils/url.dart';
 import 'package:hiring_task/view-model/member-registration/activities_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_cities_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_countries_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_all_states_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_products_by_category_services.dart';
 import 'package:hiring_task/view-model/member-registration/gpc_services.dart';
-import 'package:hiring_task/view/screens/home/home_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
 import 'package:hiring_task/widgets/dropdown_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
@@ -77,7 +78,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   String? cityName;
   int? cityId;
   String? memberCategoryValue;
-  String? memberCategoryId;
+  num? memberCategoryId;
   String? quotation;
   String? allowOtherProducts;
   String? memberCategory;
@@ -669,29 +670,16 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                           Expanded(
                                             child: GestureDetector(
                                               onTap: () async {
+                                                AppDialogs.loadingDialog(
+                                                    context);
                                                 final temp = GpcService.getGPC(
                                                     searchGpcController.text);
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                    content:
-                                                        Text('Processing Data'),
-                                                  ),
-                                                );
                                                 temp.then((value) {
+                                                  AppDialogs.closeDialog();
                                                   gpcList.clear();
                                                   for (var element in value) {
                                                     gpcList.add(element.value!);
                                                   }
-                                                  ScaffoldMessenger.of(context)
-                                                      .hideCurrentSnackBar();
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                          'Data Processed'),
-                                                    ),
-                                                  );
                                                 });
                                               },
                                               child: Image.asset(
@@ -1135,6 +1123,13 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                         onChanged: (value) {
                                           setState(() {
                                             memberCategory = value;
+                                            memberCategoryId =
+                                                productsByCategoryModel
+                                                    .gtinProducts!
+                                                    .firstWhere((element) =>
+                                                        element.productName ==
+                                                        value)
+                                                    .productID;
                                           });
                                         },
                                       ).box.make().wFull(context),
@@ -1221,7 +1216,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                     : const SizedBox(),
                                                 DropdownWidget(
                                                   value: otherProductsValue ??
-                                                      otherProductsList[0],
+                                                      otherProductsList.first,
                                                   list: otherProductsList,
                                                   onChanged: (value) {
                                                     setState(() {
@@ -1478,8 +1473,10 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                     ],
                                                   ),
                                                 )
-                                              : Expanded(
-                                                  flex: 3, child: SizedBox()),
+                                              : const Expanded(
+                                                  flex: 3,
+                                                  child: SizedBox(),
+                                                ),
                                         ],
                                       )
                                     ],
@@ -1716,13 +1713,14 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                                 );
                                         }
                                       },
-                                      child: isSubmit
-                                          ? const Center(
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                              ),
-                                            )
-                                          : const Text('Submit'),
+                                      child:
+                                          // isSubmit
+                                          //     ? const Center(
+                                          //         child: CircularProgressIndicator(
+                                          //         color: Colors.white,
+                                          //       ))
+                                          //     :
+                                          const Text('Submit'),
                                     ),
                                   ),
                                   const SizedBox(height: 20),
@@ -1785,6 +1783,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
     String? paymentType,
     String? selectedCategoryValue,
   }) async {
+    print(memberCategoryId);
     setState(() {
       isSubmit = true;
     });
@@ -1806,7 +1805,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
     });
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('https://gs1.org.sa/api/AddMember'),
+      Uri.parse('${BaseUrl.gs1}/api/AddMember'),
     );
 
     request.fields['user_type'] = 'new';
@@ -1870,7 +1869,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
         yearlyFeeArray.toString().replaceFirst('[', '').replaceFirst(']', '');
 
     request.fields['gtinprice'] = gtinPrice.toString();
-    request.fields['pkgID'] = memberCategory.toString();
+    request.fields['pkgID'] = memberCategoryId.toString();
     request.fields['gcp_type'] = '$gcpType';
 
     final productTypeArray = jsonEncode(productType);
@@ -1909,10 +1908,16 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
 
     // getting response
     try {
+      AppDialogs.loadingDialog(context);
       final response = await request.send();
 
       if (response.statusCode == 200) {
+        AppDialogs.closeDialog();
         // print('Image uploaded successfully');
+
+        final responseBody = await response.stream.bytesToString();
+        print('response body:---- $responseBody');
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Registration successfully completed'),
@@ -1932,11 +1937,14 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
           isSubmit = false;
         });
 
-        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        // Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
       } else {
+        AppDialogs.closeDialog();
+
         // showSpinner = false;
         print("status code:------" + response.statusCode.toString());
-
+        final responseBody = await response.stream.bytesToString();
+        print('response body:---- $responseBody');
         Fluttertoast.showToast(
           msg: 'Something went wrong, please try again',
           toastLength: Toast.LENGTH_SHORT,
@@ -1951,6 +1959,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
         });
       }
     } catch (error) {
+      AppDialogs.closeDialog();
+      print('error:---- $error');
       setState(() {
         isSubmit = false;
       });

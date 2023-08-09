@@ -1,10 +1,10 @@
 class SingleEventModel {
   String? gcpGLNID;
-  Null? image;
+  String? image;
   String? locationNameEn;
   String? addressEn;
   String? pobox;
-  Null? officeTel;
+  String? officeTel;
 
   SingleEventModel(
       {this.gcpGLNID,
