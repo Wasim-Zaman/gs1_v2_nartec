@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hiring_task/view/screens/gtin_tracking_screen.dart';
-import 'package:hiring_task/view/screens/qr_code_scanning_screen.dart';
 import 'package:hiring_task/utils/colors.dart';
+import 'package:hiring_task/view/screens/qr_code_scanning_screen.dart';
 
 class FirstScreen extends StatelessWidget {
   const FirstScreen({super.key});

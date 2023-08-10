@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hiring_task/utils/app_dialogs.dart';
@@ -7,10 +6,15 @@ import 'package:hiring_task/view-model/login/login_services.dart';
 import 'package:hiring_task/view/screens/log-in/otp_screen.dart';
 import 'package:hiring_task/view/screens/log-in/widgets/logo/login_logo_widget.dart';
 import 'package:hiring_task/view/screens/log-in/widgets/text_fields/password_text_field_widget.dart';
+import 'package:hiring_task/widgets/dropdown_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
 
 class SelectActivityAndPasswordScreen extends StatefulWidget {
-  const SelectActivityAndPasswordScreen({Key? key}) : super(key: key);
+  final String userEmail;
+  final List<ActivitiesModel> activities;
+  const SelectActivityAndPasswordScreen(
+      {Key? key, required this.userEmail, required this.activities})
+      : super(key: key);
   static const String routeName = "/select_activity_&_password_screen";
 
   @override
@@ -26,7 +30,7 @@ class _SelectActivityAndPasswordScreenState
   final passwordController = TextEditingController();
 
   showOtpPopup(String message,
-      {String? email, String? activity, String? password}) {
+      {String? email, String? activity, String? password, String? otp}) {
     AwesomeDialog(
       context: context,
       dialogType: DialogType.success,
@@ -35,13 +39,16 @@ class _SelectActivityAndPasswordScreenState
       desc: message,
       btnOkOnPress: () {
         Navigator.pop(context);
-        Navigator.of(context).pushNamed(
-          OTPScreen.routeName,
-          arguments: {
-            "email": email,
-            "activity": activity,
-            "password": password,
-          },
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OTPScreen(
+              email: email,
+              activity: activity,
+              password: password,
+              generatedOtp: otp,
+            ),
+          ),
         );
       },
       btnOkIcon: Icons.check_circle,
@@ -54,12 +61,18 @@ class _SelectActivityAndPasswordScreenState
   @override
   void initState() {
     formKey.currentState?.save();
+    for (var element in widget.activities) {
+      if (element.activity != null || element.activity != "null") {
+        activities.add(element.activity!);
+      }
+    }
+    activityValue = activities.first;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final email = ModalRoute.of(context)?.settings.arguments as String;
+    final email = widget.userEmail;
     return Scaffold(
       backgroundColor: bgGrey,
       appBar: AppBar(
@@ -74,69 +87,15 @@ class _SelectActivityAndPasswordScreenState
             const LoginLogoWidget(),
             const RequiredTextWidget(title: "Activity"),
             const SizedBox(height: 10),
-            FutureBuilder(
-                future: LoginServices.getActivities(email: email),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: SizedBox(
-                          height: 50, child: LinearProgressIndicator()),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          const Text(
-                              'An error occured, please refresh the page'),
-                          TextButton.icon(
-                            onPressed: () {
-                              setState(() {});
-                            },
-                            icon: const Icon(Icons.refresh_rounded),
-                            label: const Text('Refresh'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  final snap = snapshot.data as Map<String, dynamic>;
-                  final listOfAcitivies = snap['activities'] as List;
-                  activities = listOfAcitivies
-                      .where((activity) => activity != null)
-                      .map((e) => e.toString())
-                      .toList();
-                  return SizedBox(
-                    child: Card(
-                      color: bgGrey,
-                      elevation: 5,
-                      child: DropdownButton(
-                          value: activityValue,
-                          dropdownColor: bgGrey,
-                          focusColor: bgGrey,
-                          isExpanded: true,
-                          borderRadius: BorderRadius.circular(10),
-                          items: activities
-                              .where((element) => element != null)
-                              .map<DropdownMenuItem<String>>(
-                                (String v) => DropdownMenuItem<String>(
-                                  value: v,
-                                  child: AutoSizeText(
-                                    v,
-                                    maxLines: 2,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              activityValue = newValue!;
-                            });
-                          }),
-                    ),
-                  );
-                }),
+            DropdownWidget(
+              value: activityValue ?? activities.first,
+              list: activities,
+              onChanged: (activity) {
+                setState(() {
+                  activityValue = activity;
+                });
+              },
+            ),
             const SizedBox(height: 20),
             const RequiredTextWidget(title: "Password"),
             const SizedBox(height: 10),
@@ -145,7 +104,7 @@ class _SelectActivityAndPasswordScreenState
               child: PasswordTextFieldWidget(
                 controller: passwordController,
                 validator: (password) {
-                  if (password!.isEmpty || password == null) {
+                  if (password!.isEmpty) {
                     return "Please provide password";
                   }
                   return null;
@@ -166,15 +125,17 @@ class _SelectActivityAndPasswordScreenState
                     AppDialogs.loadingDialog(context);
                     LoginServices.loginWithPassword(
                             email, activityValue!, passwordController.text)
-                        .then((value) {
+                        .then((response) {
                       AppDialogs.closeDialog();
-                      final message = value['message'] as String;
+                      final message = response['message'] as String;
+                      final otp = response['otp'] as String;
 
                       showOtpPopup(
                         message,
                         email: email,
                         activity: activityValue,
                         password: passwordController.text,
+                        otp: otp,
                       );
                     }).onError((error, stackTrace) {
                       AppDialogs.closeDialog();
@@ -191,7 +152,6 @@ class _SelectActivityAndPasswordScreenState
                       ).show();
                     });
                   } else {
-                    AppDialogs.closeDialog();
                     AwesomeDialog(
                       context: context,
                       dialogType: DialogType.error,

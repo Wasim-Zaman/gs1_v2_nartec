@@ -35,9 +35,11 @@ class _DropdownWidgetState extends State<DropdownWidget> {
       child: DropdownButtonFormField(
         // Initial Value
         value: widget.value,
+        decoration: const InputDecoration(border: InputBorder.none),
 
         isDense: true,
         isExpanded: true,
+
         // Down Arrow Icon
         icon: const Icon(Icons.keyboard_arrow_down),
 

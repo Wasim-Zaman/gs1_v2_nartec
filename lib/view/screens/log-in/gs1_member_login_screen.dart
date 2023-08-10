@@ -40,12 +40,17 @@ class _Gs1MemberLoginScreenState extends State<Gs1MemberLoginScreen> {
   login() {
     if (formKey.currentState?.validate() ?? false) {
       AppDialogs.loadingDialog(context);
-      LoginServices.getActivities(email: emailController.text.trim()).then((_) {
+      LoginServices.getActivities(email: emailController.text.trim())
+          .then((activities) {
         AppDialogs.closeDialog();
-        Navigator.pushNamed(
+        Navigator.push(
           context,
-          SelectActivityAndPasswordScreen.routeName,
-          arguments: emailController.text,
+          MaterialPageRoute(
+            builder: (context) => SelectActivityAndPasswordScreen(
+              userEmail: emailController.text,
+              activities: activities,
+            ),
+          ),
         );
       }).catchError((error) {
         AppDialogs.closeDialog();

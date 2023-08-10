@@ -22,6 +22,7 @@ import 'package:hiring_task/view-model/member-registration/get_all_countries_ser
 import 'package:hiring_task/view-model/member-registration/get_all_states_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_products_by_category_services.dart';
 import 'package:hiring_task/view-model/member-registration/gpc_services.dart';
+import 'package:hiring_task/view/screens/home/home_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
 import 'package:hiring_task/widgets/dropdown_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
@@ -1883,7 +1884,10 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
         .replaceFirst(']', '');
 
     final otherProductsIdArray = jsonEncode(otherProductId);
-    request.fields['otherProdID'] = otherProductsIdArray.toString();
+    request.fields['otherProdID'] = otherProductsIdArray
+        .toString()
+        .replaceFirst('[', '')
+        .replaceFirst(']', '');
 
     request.fields['total'] = totalPrice.toString();
     request.fields['payment_type'] = paymentType.toString();
@@ -1937,10 +1941,9 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
           isSubmit = false;
         });
 
-        // Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
       } else {
         AppDialogs.closeDialog();
-
         // showSpinner = false;
         print("status code:------" + response.statusCode.toString());
         final responseBody = await response.stream.bytesToString();

@@ -11,7 +11,16 @@ import 'package:hiring_task/widgets/required_text_widget.dart';
 import 'package:pinput/pinput.dart';
 
 class OTPScreen extends StatefulWidget {
-  const OTPScreen({super.key});
+  final String? email;
+  final String? activity;
+  final String? password;
+  final String? generatedOtp;
+  const OTPScreen(
+      {super.key,
+      required this.email,
+      required this.activity,
+      required this.password,
+      required this.generatedOtp});
   static const String routeName = "/otp_screen";
 
   @override
@@ -20,7 +29,7 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> {
   final formKey = GlobalKey<FormState>();
-  final otpController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
   String? generatedOtp;
 
   @override
@@ -28,24 +37,29 @@ class _OTPScreenState extends State<OTPScreen> {
     formKey.currentState?.save();
     Future.delayed(Duration.zero, () async {
       AppDialogs.loadingDialog(context);
-      final args = ModalRoute.of(context)?.settings.arguments as Map;
-      final email = args["email"];
-      final activity = args["activity"];
-
-      try {
-        final response = await LoginServices.sendOTP(email, activity);
+      Future.delayed(const Duration(seconds: 2), () {
+        otpController.text = widget.generatedOtp.toString();
+      }).then((value) {
         AppDialogs.closeDialog();
+      });
+      //   final args = ModalRoute.of(context)?.settings.arguments as Map;
+      //   final email = args["email"];
+      //   final activity = args["activity"];
 
-        Common.showToast(response["message"], backgroundColor: Colors.green);
-        generatedOtp = response["otp"];
-        otpController.text = response["otp"];
-      } catch (e) {
-        AppDialogs.closeDialog();
-        Common.showToast(e.toString(), backgroundColor: Colors.red);
-        Future.delayed(const Duration(seconds: 2)).then((_) {
-          Navigator.pop(context);
-        });
-      }
+      //   try {
+      //     final response = await LoginServices.sendOTP(email, activity);
+      //     AppDialogs.closeDialog();
+
+      //     Common.showToast(response["message"], backgroundColor: Colors.green);
+      //     generatedOtp = response["otp"];
+      //     otpController.text = response["otp"];
+      //   } catch (e) {
+      //     AppDialogs.closeDialog();
+      //     Common.showToast(e.toString(), backgroundColor: Colors.red);
+      //     Future.delayed(const Duration(seconds: 2)).then((_) {
+      //       Navigator.pop(context);
+      //     });
+      //   }
     });
     super.initState();
   }
@@ -125,18 +139,13 @@ class _OTPScreenState extends State<OTPScreen> {
                           if (formKey.currentState!.validate()) {
                             formKey.currentState!.save();
                             AppDialogs.loadingDialog(context);
-                            final args = ModalRoute.of(context)
-                                ?.settings
-                                .arguments as Map;
-                            final email = args["email"];
-                            final activity = args["activity"];
-                            final password = args['password'];
+
                             try {
                               final response = await LoginServices.confirmation(
-                                email.toString(),
-                                activity.toString(),
-                                password.toString(),
-                                generatedOtp.toString(),
+                                widget.email.toString(),
+                                widget.activity.toString(),
+                                widget.password.toString(),
+                                widget.generatedOtp.toString(),
                                 otpController.text,
                               );
                               AppDialogs.closeDialog();

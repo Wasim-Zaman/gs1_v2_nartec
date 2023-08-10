@@ -102,7 +102,7 @@ class Common {
     double? fontSize,
   }) {
     Fluttertoast.showToast(
-      msg: message,
+      msg: message.replaceAll("Exception:", ""),
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hiring_task/constants/colors/app_colors.dart';
 import 'package:hiring_task/models/login-models/profile/subscription_model.dart';
 import 'package:hiring_task/res/common/common.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/view-model/login/after-login/renewal_services.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
 
@@ -35,20 +37,22 @@ class _RenewMembershipScreenState extends State<RenewMembershipScreen> {
   }
 
   continueToPayment() async {
-    Common.showToast('Loading');
+    AppDialogs.loadingDialog(context);
 
     RenewalServices.proceedRenewal(
       userId,
       subscritionModel: subscriptionModel,
     ).then((_) {
+      AppDialogs.closeDialog();
       Common.showToast(
         'Renewal Successful',
         backgroundColor: Colors.blue,
       );
       Navigator.of(context).pop();
     }).catchError((e) {
+      AppDialogs.closeDialog();
       Common.showToast(
-        "Something went wrong, please try again later",
+        e.toString(),
         backgroundColor: Colors.red,
       );
     });
@@ -71,7 +75,6 @@ class _RenewMembershipScreenState extends State<RenewMembershipScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.black87,
         automaticallyImplyLeading: true,
         actions: [
           ElevatedButton.icon(
@@ -79,7 +82,7 @@ class _RenewMembershipScreenState extends State<RenewMembershipScreen> {
             onPressed: continueToPayment,
             icon: const Icon(Icons.save),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
             ),
           ),

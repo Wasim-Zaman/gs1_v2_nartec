@@ -17,11 +17,9 @@ import 'package:hiring_task/view/screens/log-in/after-login/products.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/sscc_screen.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/subscribe_products_screen.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
-import 'package:hiring_task/view/screens/log-in/otp_screen.dart';
 import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_one.dart';
 import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_three.dart';
 import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_two.dart';
-import 'package:hiring_task/view/screens/log-in/select_activity_and_password_screen.dart';
 import 'package:hiring_task/view/screens/logistic_information_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/memeber_registration_screen.dart';
@@ -80,11 +78,11 @@ class RoutesManagement {
       DirectionMarkScreen.routeName: (context) => const DirectionMarkScreen(),
       MemberRegistrationScreen.routeName: (context) =>
           const MemberRegistrationScreen(),
-      SelectActivityAndPasswordScreen.routeName: (context) =>
-          const SelectActivityAndPasswordScreen(),
+      // SelectActivityAndPasswordScreen.routeName: (context) =>
+      //     const SelectActivityAndPasswordScreen(),
       // after login screens
       Dashboard.routeName: (context) => const Dashboard(),
-      OTPScreen.routeName: (context) => const OTPScreen(),
+      // OTPScreen.routeName: (context) => const OTPScreen(),
       Products.routeName: (context) => const Products(),
       MemberGLNScreen.routeName: (context) => const MemberGLNScreen(),
       SSCCScreen.routeName: (context) => const SSCCScreen(),

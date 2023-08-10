@@ -92,6 +92,7 @@ class LoginServices {
         'Host': BaseUrl.host,
       },
     ).then((response) {
+      print("response.body ${response.body}");
       if (response.statusCode == 200) {
         // handle successful response
         final responseBody = json.decode(response.body) as Map<String, dynamic>;
@@ -104,7 +105,7 @@ class LoginServices {
     });
   }
 
-  static Future<Map<String, dynamic>> getActivities({String? email}) async {
+  static Future<List<ActivitiesModel>> getActivities({String? email}) async {
     const baseUrl = '${BaseUrl.gs1}/api/email/verification';
 
     final uri = Uri.parse(baseUrl);
@@ -121,13 +122,17 @@ class LoginServices {
           'Host': BaseUrl.host,
         },
       );
-
-      print(response.statusCode);
-      print(response.body);
+      print("response.body ${response.body}");
       if (response.statusCode == 200) {
         // handle successful response
-        final responseBody = json.decode(response.body) as Map<String, dynamic>;
-        return responseBody;
+        final responseBody = json.decode(response.body);
+        final activitiesList = responseBody["activities"] as List;
+        List<ActivitiesModel> activities = [];
+        activitiesList.forEach((element) {
+          activities.add(ActivitiesModel.fromJson(element));
+        });
+
+        return activities;
       } else if (response.statusCode == 404) {
         throw Exception('Something went wrong');
       } else if (response.statusCode == 500) {
@@ -141,5 +146,24 @@ class LoginServices {
     } catch (e) {
       throw Exception(e.toString());
     }
+  }
+}
+
+class ActivitiesModel {
+  String? activity;
+  String? activityID;
+
+  ActivitiesModel({this.activity, this.activityID});
+
+  ActivitiesModel.fromJson(Map<String, dynamic> json) {
+    activity = json['activity'];
+    activityID = json['activityID'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['activity'] = activity;
+    data['activityID'] = activityID;
+    return data;
   }
 }
