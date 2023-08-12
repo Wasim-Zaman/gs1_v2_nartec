@@ -1,6 +1,7 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:hiring_task/constants/colors/app_colors.dart';
 import 'package:hiring_task/models/login-models/dashboard_model.dart';
 import 'package:hiring_task/models/login-models/profile/subscription_model.dart';
 import 'package:hiring_task/view-model/login/after-login/subscription_services.dart';
@@ -86,8 +87,29 @@ class _SubscribeProductsScreenState extends State<SubscribeProductsScreen> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const LoadingWidget();
-              }
-              if (!snapshot.hasData) {
+              } else if (!snapshot.hasData) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 60,
+                        color: AppColors.primaryColor,
+                      ),
+                      const Text("No Data Found"),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text("Refresh The Page"),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (snapshot.hasError) {
                 return Center(
                   child: (snapshot.error
                           .toString()
@@ -139,24 +161,6 @@ class _SubscribeProductsScreenState extends State<SubscribeProductsScreen> {
                             ),
                           ],
                         ),
-                );
-              }
-              if (snapshot.hasError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error,
-                        color: Colors.red,
-                        size: 60,
-                      ),
-                      Text(
-                        "Error: ${snapshot.error}",
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
                 );
               }
               final response = snapshot.data;

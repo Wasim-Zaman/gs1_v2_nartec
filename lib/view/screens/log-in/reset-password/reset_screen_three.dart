@@ -22,7 +22,8 @@ class _ResetScreenThreeState extends State<ResetScreenThree> {
 
   resetPassword() {
     final email = Provider.of<LoginProvider>(context, listen: false).email;
-    final activity = Provider.of<LoginProvider>(context, listen: false).activity;
+    final activity =
+        Provider.of<LoginProvider>(context, listen: false).activity;
 
     try {
       ResetPasswordServices.resetPassword(

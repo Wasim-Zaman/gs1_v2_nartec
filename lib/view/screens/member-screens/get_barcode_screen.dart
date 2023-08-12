@@ -263,9 +263,9 @@ class CustomTextField extends StatelessWidget {
       ),
       validator: validator ??
           (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please provide value to the field';
-            }
+            // if (value == null || value.isEmpty) {
+            //   return 'Please provide value to the field';
+            // }
             return null;
           },
     );

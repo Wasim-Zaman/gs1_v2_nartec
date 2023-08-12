@@ -22,7 +22,8 @@ class _ResetScreenTwoState extends State<ResetScreenTwo> {
 
   verifyCode() {
     final email = Provider.of<LoginProvider>(context, listen: false).email;
-    final activity = Provider.of<LoginProvider>(context, listen: false).activity;
+    final activity =
+        Provider.of<LoginProvider>(context, listen: false).activity;
     Provider.of<LoginProvider>(context, listen: false).setOtp(
       codeController.text,
     );

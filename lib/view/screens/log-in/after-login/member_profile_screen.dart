@@ -4,6 +4,7 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
+import 'package:hiring_task/constants/colors/app_colors.dart';
 import 'package:hiring_task/constants/icons/app_icons.dart';
 import 'package:hiring_task/models/login-models/dashboard_model.dart';
 import 'package:hiring_task/models/login-models/profile/member_profile_model.dart';
@@ -62,30 +63,34 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const LoadingWidget();
-            }
-            if (!snapshot.hasData) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 60,
-                    color: Colors.red,
-                  ),
-                  Text(snapshot.error.toString()),
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.refresh),
-                    label: const Text("Refresh The Page"),
-                  ),
-                ],
+            } else if (!snapshot.hasData) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 60,
+                      color: AppColors.primaryColor,
+                    ),
+                    const Text("No Data Found"),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("Refresh The Page"),
+                    ),
+                  ],
+                ),
               );
             }
             if (snapshot.hasError) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.error_outline,
@@ -94,7 +99,9 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
                     ),
                     Text(snapshot.error.toString()),
                     ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {});
+                      },
                       icon: const Icon(Icons.refresh),
                       label: const Text("Refresh The Page"),
                     ),

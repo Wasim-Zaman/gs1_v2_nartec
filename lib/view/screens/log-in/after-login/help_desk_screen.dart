@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hiring_task/constants/colors/app_colors.dart';
 import 'package:hiring_task/models/login-models/dashboard_model.dart';
 import 'package:hiring_task/view-model/login/after-login/help_desk_services.dart';
 import 'package:hiring_task/view/screens/log-in/widgets/text_widgets/table_header_text.dart';
@@ -53,8 +54,7 @@ class _HelpDeskScreenState extends State<HelpDeskScreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const LoadingWidget();
-            }
-            if (!snapshot.hasData) {
+            } else if (snapshot.hasError) {
               return Center(
                 child: (snapshot.error
                         .toString()
@@ -83,33 +83,35 @@ class _HelpDeskScreenState extends State<HelpDeskScreen> {
                               .centered(),
                         ],
                       )
-                    : Column(
+                    : const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(
                             Icons.error_outline_sharp,
                             size: 100,
                           ),
-                          Text('No Data'),
+                          Text('Something went wrong!'),
                         ],
                       ),
               );
-            }
-            if (snapshot.hasError) {
-              return Center(
+            } else if (!snapshot.hasData) {
+              Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(
-                      Icons.error_outline_sharp,
-                      size: 100,
+                      Icons.error_outline,
+                      size: 60,
+                      color: AppColors.primaryColor,
                     ),
-                    Text(snapshot.error.toString()),
-                    ElevatedButton(
+                    const Text("No Data Found"),
+                    ElevatedButton.icon(
                       onPressed: () {
                         setState(() {});
                       },
-                      child: const Text('Retry'),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("Refresh The Page"),
                     ),
                   ],
                 ),

@@ -14,6 +14,7 @@ import 'package:hiring_task/models/member-registration/get_all_countries.dart';
 import 'package:hiring_task/models/member-registration/get_all_cr_model.dart';
 import 'package:hiring_task/models/member-registration/get_all_states_model.dart';
 import 'package:hiring_task/models/member-registration/get_products_by_category_model.dart';
+import 'package:hiring_task/res/common/common.dart';
 import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/utils/url.dart';
 import 'package:hiring_task/view-model/member-registration/activities_services.dart';
@@ -22,10 +23,10 @@ import 'package:hiring_task/view-model/member-registration/get_all_countries_ser
 import 'package:hiring_task/view-model/member-registration/get_all_states_services.dart';
 import 'package:hiring_task/view-model/member-registration/get_products_by_category_services.dart';
 import 'package:hiring_task/view-model/member-registration/gpc_services.dart';
-import 'package:hiring_task/view/screens/home/home_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
 import 'package:hiring_task/widgets/dropdown_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
+import 'package:hiring_task/widgets/text/title_text_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -68,6 +69,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   GlobalKey formKey = GlobalKey<FormState>();
 
   String? activityId;
+
+  bool isChecked = false;
 
   // for drop down lists
   String? activityValue;
@@ -137,8 +140,19 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
   String? crNumber;
   bool? hasCrNumber;
 
+  // form keys
+  final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey3 = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey4 = GlobalKey<FormState>();
+
   @override
   void initState() {
+    _formKey1.currentState?.validate();
+    _formKey2.currentState?.validate();
+    _formKey3.currentState?.validate();
+    _formKey4.currentState?.validate();
+
     // getAllOtherProducts();
     // getAllMemberCategories();
     GetProductsByCategoryServices.getProductsByCategory(
@@ -265,198 +279,203 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      document != null
-                                          ? Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const RequiredTextWidget(
-                                                    title: "Document Number"),
-                                                const SizedBox(height: 5),
-                                                CustomTextField(
-                                                  controller:
-                                                      documentNoContoller,
-                                                  hintText: "Document Number",
-                                                  validator: (value) {
-                                                    if (value!.isEmpty) {
-                                                      return "Document Number is required";
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                                const SizedBox(height: 10),
-                                              ],
-                                            )
-                                          : Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const RequiredTextWidget(
-                                                    title: "CR Activities"),
-                                                const SizedBox(height: 5),
-                                                FutureBuilder(
-                                                    future: ActivitiesService
-                                                        .getActivities(
-                                                      crNumber.toString(),
-                                                    ),
-                                                    builder:
-                                                        (context, snapshot) {
-                                                      if (snapshot
-                                                              .connectionState ==
-                                                          ConnectionState
-                                                              .waiting) {
-                                                        return const Center(
-                                                          child: SizedBox(
-                                                            height: 40,
-                                                            child:
-                                                                LinearProgressIndicator(
-                                                              semanticsLabel:
-                                                                  "Loading",
+                                  Form(
+                                    key: _formKey1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        document != null
+                                            ? Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const RequiredTextWidget(
+                                                      title: "Document Number"),
+                                                  const SizedBox(height: 5),
+                                                  CustomTextField(
+                                                    controller:
+                                                        documentNoContoller,
+                                                    hintText: "Document Number",
+                                                    validator: (value) {
+                                                      if (value!.isEmpty) {
+                                                        return "Document Number is required";
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                ],
+                                              )
+                                            : Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const RequiredTextWidget(
+                                                      title: "CR Activities"),
+                                                  const SizedBox(height: 5),
+                                                  FutureBuilder(
+                                                      future: ActivitiesService
+                                                          .getActivities(
+                                                        crNumber.toString(),
+                                                      ),
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        if (snapshot
+                                                                .connectionState ==
+                                                            ConnectionState
+                                                                .waiting) {
+                                                          return const Center(
+                                                            child: SizedBox(
+                                                              height: 40,
+                                                              child:
+                                                                  LinearProgressIndicator(
+                                                                semanticsLabel:
+                                                                    "Loading",
+                                                              ),
                                                             ),
-                                                          ),
-                                                        );
-                                                      }
-                                                      if (snapshot.hasError) {
-                                                        return const Center(
-                                                          child: Text(
-                                                              "Something went wrong, try again later"),
-                                                        );
-                                                      }
-                                                      final snap = snapshot.data
-                                                          as List<
-                                                              GetAllCrActivitiesModel>;
-                                                      activitiesList = snap;
-                                                      for (var element
-                                                          in activitiesList) {
-                                                        activities.add(element
-                                                            .activity
-                                                            .toString());
-                                                      }
-                                                      return activities.isEmpty
-                                                          ? IconButton(
-                                                              onPressed: () {
-                                                                setState(() {});
-                                                              },
-                                                              icon: const Icon(
-                                                                  Icons
-                                                                      .refresh))
-                                                          : SizedBox(
-                                                              height: 50,
-                                                              child: FittedBox(
-                                                                child: DropdownButton(
-                                                                    value: activityValue,
-                                                                    items: activities
-                                                                        .map<DropdownMenuItem<String>>(
-                                                                          (String v) =>
-                                                                              DropdownMenuItem<String>(
-                                                                            value:
-                                                                                v,
-                                                                            child:
-                                                                                Column(
-                                                                              children: [
-                                                                                FittedBox(
-                                                                                  child: Text(
-                                                                                    v,
-                                                                                    softWrap: true,
-                                                                                    style: const TextStyle(
-                                                                                      color: Colors.black,
-                                                                                      // fontSize: 10,
+                                                          );
+                                                        }
+                                                        if (snapshot.hasError) {
+                                                          return const Center(
+                                                            child: Text(
+                                                                "Something went wrong, try again later"),
+                                                          );
+                                                        }
+                                                        final snap = snapshot
+                                                                .data
+                                                            as List<
+                                                                GetAllCrActivitiesModel>;
+                                                        activitiesList = snap;
+                                                        for (var element
+                                                            in activitiesList) {
+                                                          activities.add(element
+                                                              .activity
+                                                              .toString());
+                                                        }
+                                                        return activities
+                                                                .isEmpty
+                                                            ? IconButton(
+                                                                onPressed: () {
+                                                                  setState(
+                                                                      () {});
+                                                                },
+                                                                icon: const Icon(
+                                                                    Icons
+                                                                        .refresh))
+                                                            : SizedBox(
+                                                                height: 50,
+                                                                child:
+                                                                    FittedBox(
+                                                                  child: DropdownButton(
+                                                                      value: activityValue,
+                                                                      items: activities
+                                                                          .map<DropdownMenuItem<String>>(
+                                                                            (String v) =>
+                                                                                DropdownMenuItem<String>(
+                                                                              value: v,
+                                                                              child: Column(
+                                                                                children: [
+                                                                                  FittedBox(
+                                                                                    child: Text(
+                                                                                      v,
+                                                                                      softWrap: true,
+                                                                                      style: const TextStyle(
+                                                                                        color: Colors.black,
+                                                                                        // fontSize: 10,
+                                                                                      ),
                                                                                     ),
                                                                                   ),
-                                                                                ),
-                                                                              ],
+                                                                                ],
+                                                                              ),
                                                                             ),
-                                                                          ),
-                                                                        )
-                                                                        .toList(),
-                                                                    onChanged: (String? newValue) {
-                                                                      setState(
-                                                                          () {
-                                                                        activityValue =
-                                                                            newValue;
-                                                                        activityId =
-                                                                            snap.firstWhere((element) {
-                                                                          return element.activity ==
+                                                                          )
+                                                                          .toList(),
+                                                                      onChanged: (String? newValue) {
+                                                                        setState(
+                                                                            () {
+                                                                          activityValue =
                                                                               newValue;
-                                                                        }).id;
-                                                                      });
-                                                                    }),
-                                                              ),
-                                                            );
-                                                    }),
-                                              ],
-                                            ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(title: 'Email'),
-                                      const SizedBox(height: 5),
-                                      CustomTextField(
-                                        hintText: "Enter Valid Email",
-                                        controller: emailController,
-                                        validator: (email) {
-                                          if (EmailValidator.validate(email!)) {
+                                                                          activityId =
+                                                                              snap.firstWhere((element) {
+                                                                            return element.activity ==
+                                                                                newValue;
+                                                                          }).id;
+                                                                        });
+                                                                      }),
+                                                                ),
+                                                              );
+                                                      }),
+                                                ],
+                                              ),
+                                        const SizedBox(height: 20),
+                                        const RequiredTextWidget(
+                                            title: 'Email'),
+                                        const SizedBox(height: 5),
+                                        CustomTextField(
+                                          hintText: "Enter Valid Email",
+                                          controller: emailController,
+                                          validator: (email) {
+                                            if (EmailValidator.validate(
+                                                email!)) {
+                                              return null;
+                                            } else {
+                                              return 'Please enter a valid email';
+                                            }
+                                          },
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const RequiredTextWidget(
+                                            title: 'Company Name English'),
+                                        const SizedBox(height: 5),
+                                        CustomTextField(
+                                          hintText: "Company Name English",
+                                          controller: companyNameEnController,
+                                          keyboardType: TextInputType.text,
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return 'Company Name is required';
+                                            }
                                             return null;
-                                          } else {
-                                            return 'Please enter a valid email';
-                                          }
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                          title: 'Company Name English'),
-                                      const SizedBox(height: 5),
-                                      CustomTextField(
-                                        hintText: "Company Name English",
-                                        controller: companyNameEnController,
-                                        keyboardType: TextInputType.text,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter a valid company name';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                          title: 'Company Name Arabic'),
-                                      const SizedBox(height: 5),
-                                      CustomTextField(
-                                        hintText: "Company Name Arabic",
-                                        controller: companyNameArController,
-                                        keyboardType: TextInputType.text,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter a valid company name';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                        title: 'Contact Person',
-                                      ),
-                                      const SizedBox(height: 5),
-                                      CustomTextField(
-                                        hintText: "Contact Person",
-                                        controller: contactPersonController,
-                                        keyboardType: TextInputType.text,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter a valid contact person';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                    ],
+                                          },
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const RequiredTextWidget(
+                                            title: 'Company Name Arabic'),
+                                        const SizedBox(height: 5),
+                                        CustomTextField(
+                                          hintText: "Company Name Arabic",
+                                          controller: companyNameArController,
+                                          keyboardType: TextInputType.text,
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return 'Company Name is required';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const TitleTextWidget(
+                                          text: 'Contact Person',
+                                        ),
+                                        const SizedBox(height: 5),
+                                        CustomTextField(
+                                          hintText: "Contact Person",
+                                          controller: contactPersonController,
+                                          keyboardType: TextInputType.text,
+                                        ),
+                                        const SizedBox(height: 20),
+                                      ],
+                                    ),
                                   ),
                                   NextPrevButtons(
                                     onNextClicked: () => setState(() {
-                                      isFirstClicked = false;
-                                      isSecondClicked = true;
+                                      if (_formKey1.currentState!.validate()) {
+                                        isFirstClicked = false;
+                                        isSecondClicked = true;
+                                      }
+                                      // isFirstClicked = false;
+                                      // isSecondClicked = true;
                                     }),
                                   ),
                                 ],
@@ -467,142 +486,157 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const RequiredTextWidget(
-                                          title: 'Company Landline'),
-                                      const SizedBox(height: 5),
-                                      TextFormField(
-                                        decoration: InputDecoration(
-                                          prefixIcon: GestureDetector(
-                                            onTap: () {
-                                              showCountryPicker(
-                                                  context: context,
-                                                  onSelect: (Country country) {
-                                                    landLineController.text =
-                                                        "+${country.phoneCode}";
-                                                  });
-                                            },
-                                            child: Image.asset(
-                                              'assets/images/landline.png',
-                                            ),
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        // hintText: "Company Landline",
-                                        controller: landLineController,
-                                        keyboardType: TextInputType.number,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return "Please enter mobile number";
-                                          }
-                                          if (value.length < 13 ||
-                                              value.length > 13) {
-                                            return "Please enter valid Landline number";
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                          title: 'Mobile No (Omit Zero)'),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 3,
-                                            child: TextFormField(
-                                              decoration: InputDecoration(
-                                                prefixIcon: GestureDetector(
-                                                    onTap: () {
-                                                      showCountryPicker(
-                                                          context: context,
-                                                          onSelect: (Country
-                                                              country) {
-                                                            mobileController
-                                                                    .text =
-                                                                "+${country.phoneCode}";
-                                                          });
-                                                    },
-                                                    child: Image.asset(
-                                                        'assets/images/mobile.png')),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              controller: mobileController,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              validator: (value) {
-                                                if (value!.isEmpty) {
-                                                  return "Please enter mobile number";
-                                                }
-                                                if (value.length < 13 ||
-                                                    value.length > 13) {
-                                                  return "Please enter valid mobile number";
-                                                }
-                                                return null;
+                                  Form(
+                                    key: _formKey2,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const TitleTextWidget(
+                                            text: 'Company Landline'),
+                                        const SizedBox(height: 5),
+                                        TextFormField(
+                                          decoration: InputDecoration(
+                                            prefixIcon: GestureDetector(
+                                              onTap: () {
+                                                showCountryPicker(
+                                                    context: context,
+                                                    onSelect:
+                                                        (Country country) {
+                                                      landLineController.text =
+                                                          "+${country.phoneCode}";
+                                                    });
                                               },
+                                              child: Image.asset(
+                                                'assets/images/landline.png',
+                                              ),
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                          title: 'Extension'),
-                                      const SizedBox(height: 5),
-                                      CustomTextField(
-                                        hintText: "Extension",
-                                        controller: extensionController,
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                          title: "Zip Code"),
-                                      const SizedBox(height: 5),
-                                      TextFormField(
-                                        decoration: InputDecoration(
-                                          prefixIcon: Image.asset(
-                                            'assets/images/zip.png',
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
+                                          // hintText: "Company Landline",
+                                          controller: landLineController,
+                                          keyboardType: TextInputType.number,
                                         ),
-                                        // hintText: "Company Landline",
-                                        controller: zipCodeController,
-                                        keyboardType: TextInputType.number,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return "Kindly provide zip code";
-                                          }
+                                        const SizedBox(height: 20),
+                                        const RequiredTextWidget(
+                                            title: 'Mobile No (Omit Zero)'),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 3,
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                  prefixIcon: GestureDetector(
+                                                      onTap: () {
+                                                        showCountryPicker(
+                                                            context: context,
+                                                            onSelect: (Country
+                                                                country) {
+                                                              mobileController
+                                                                      .text =
+                                                                  "+${country.phoneCode}";
+                                                            });
+                                                      },
+                                                      child: Image.asset(
+                                                          'assets/images/mobile.png')),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                ),
+                                                controller: mobileController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                autovalidateMode:
+                                                    AutovalidateMode
+                                                        .onUserInteraction,
+                                                validator: (value) {
+                                                  if (value!.isEmpty) {
+                                                    return "Please enter mobile number";
+                                                  }
+                                                  if (value.length < 13 ||
+                                                      value.length > 13) {
+                                                    return "Please enter valid mobile number";
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const TitleTextWidget(
+                                            text: 'Extension'),
+                                        const SizedBox(height: 5),
+                                        CustomTextField(
+                                          hintText: "Extension",
+                                          controller: extensionController,
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const RequiredTextWidget(
+                                            title: "Zip Code"),
+                                        const SizedBox(height: 5),
+                                        TextFormField(
+                                          decoration: InputDecoration(
+                                            prefixIcon: Image.asset(
+                                              'assets/images/zip.png',
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          // hintText: "Company Landline",
+                                          controller: zipCodeController,
+                                          keyboardType: TextInputType.number,
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return "Kindly provide zip code";
+                                            }
 
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const RequiredTextWidget(
-                                          title: "https://www."),
-                                      const SizedBox(height: 5),
-                                      TextFormField(
-                                        controller: websiteController,
-                                        decoration: InputDecoration(
-                                          prefixIcon: Image.asset(
-                                            'assets/images/web.png',
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            return null;
+                                          },
+                                        ),
+                                        const SizedBox(height: 20),
+                                        const RequiredTextWidget(
+                                            title: "https://www."),
+                                        const SizedBox(height: 5),
+                                        TextFormField(
+                                          controller: websiteController,
+                                          keyboardType: TextInputType.url,
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return "Kindly provide website";
+                                            }
+                                            if (!value.contains('https://')) {
+                                              return "Kindly provide valid website";
+                                            }
+
+                                            return null;
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Image.asset(
+                                              'assets/images/web.png',
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            errorStyle: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 15,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   NextPrevButtons(
                                     prevWidget: PreviousButtonWidget(
@@ -612,8 +646,12 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                       }),
                                     ),
                                     onNextClicked: () => setState(() {
-                                      isSecondClicked = false;
-                                      isThirdClicked = true;
+                                      if (_formKey2.currentState!.validate()) {
+                                        isSecondClicked = false;
+                                        isThirdClicked = true;
+                                      }
+                                      // isSecondClicked = false;
+                                      // isThirdClicked = true;
                                     }),
                                   ),
                                 ],
@@ -1118,7 +1156,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                       //   ],
                                       // ),
                                       DropdownWidget(
-                                        value: memberCategoryValue ??
+                                        value: memberCategory ??
                                             memberCategoryList[0],
                                         list: memberCategoryList,
                                         onChanged: (value) {
@@ -1501,7 +1539,9 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                         // bank transfer
                                         Column(
                                           children: [
-                                            SizedBox(
+                                            Container(
+                                              color: const Color.fromRGBO(
+                                                  226, 227, 231, 1),
                                               width: 130,
                                               height: 100,
                                               child: Image.asset(
@@ -1569,23 +1609,51 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
+
+                                  // create a check box for accepting terms and conditions
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Checkbox(
+                                        value: isChecked,
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            isChecked = value!;
+                                          });
+                                        },
+                                      ),
+                                      const Text(
+                                        "I accept the Terms and Conditions",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   Container(
                                     width: double.infinity,
-                                    height: 50,
+                                    height: 40,
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 30),
                                     child: ElevatedButton(
                                       onPressed: () {
                                         // do not submit the form if any of the value is empty
-
-                                        if (emailController.text.isEmpty ||
+                                        if (!isChecked) {
+                                          Common.showToast(
+                                              "Please accept the terms and conditions");
+                                        } else if (emailController
+                                                .text.isEmpty ||
                                             companyNameEnController
                                                 .text.isEmpty ||
                                             companyNameArController
                                                 .text.isEmpty ||
-                                            contactPersonController
-                                                .text.isEmpty ||
-                                            landLineController.text.isEmpty ||
                                             mobileController.text.isEmpty ||
                                             extensionController.text.isEmpty ||
                                             zipCodeController.text.isEmpty ||
@@ -1598,19 +1666,9 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
                                             memberCategory == null ||
                                             otherProductsList.isEmpty ||
                                             file == null ||
-                                            imageFile == null ||
                                             bankType == null) {
-                                          ScaffoldMessenger.of(context)
-                                              .clearSnackBars();
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Kindly fill all the fields or select all the values',
-                                              ),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                                          Common.showToast(
+                                              "Please fill the required fields");
                                         } else {
                                           isSubmit
                                               ? () {}
@@ -1844,6 +1902,8 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
         .replaceFirst('[', '')
         .replaceFirst(']', '');
 
+    print("other products:" + otherProductsArray);
+
     List<String> test = [];
     product?.forEach((element) {
       test.add(element.replaceAll(',', ''));
@@ -1884,10 +1944,10 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
         .replaceFirst(']', '');
 
     final otherProductsIdArray = jsonEncode(otherProductId);
-    request.fields['otherProdID'] = otherProductsIdArray
-        .toString()
-        .replaceFirst('[', '')
-        .replaceFirst(']', '');
+    request.fields['otherProdID'] = otherProductsIdArray;
+    // .toString()
+    // .replaceFirst('[', '')
+    // .replaceFirst(']', '');
 
     request.fields['total'] = totalPrice.toString();
     request.fields['payment_type'] = paymentType.toString();
@@ -1922,11 +1982,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
         final responseBody = await response.stream.bytesToString();
         print('response body:---- $responseBody');
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registration successfully completed'),
-          ),
-        );
+        Common.showToast('Registration successful');
         // print("Image successfully uploaded!");
         // final responseBody = await response.stream.bytesToString();
         // try {
@@ -1941,7 +1997,7 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
           isSubmit = false;
         });
 
-        Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+        // Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
       } else {
         AppDialogs.closeDialog();
         // showSpinner = false;
