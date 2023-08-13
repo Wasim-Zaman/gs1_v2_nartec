@@ -26,7 +26,6 @@ class GetProductsByCategoryServices {
             'Content-Type': 'application/json',
           });
 
-      print("response.statusCode ${response.statusCode}");
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         getProductsByCategoryModel =

@@ -30,8 +30,6 @@ class CreateTicketService {
           filename: file.path);
       request.files.add(imageMultipartFile);
 
-      print('sending....');
-
       // getting response
       try {
         final response = await request.send();
@@ -54,14 +52,12 @@ class CreateTicketService {
           "Something went wrong, please try again",
           backgroundColor: Colors.red,
         );
-        print("********** Error: $error");
       }
     } catch (error) {
       Common.showToast(
         "Something went wrong, please try again",
         backgroundColor: Colors.red,
       );
-      print("********** Error: $error");
     }
   }
 }

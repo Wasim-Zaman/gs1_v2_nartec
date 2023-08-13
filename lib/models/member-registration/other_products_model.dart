@@ -30,7 +30,7 @@ class OtherProductsModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['product_name'] = productName;
     data['total_no_of_barcodes'] = totalNoOfBarcodes;

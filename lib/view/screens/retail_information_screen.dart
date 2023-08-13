@@ -87,10 +87,10 @@ class Screen extends StatelessWidget {
                     arguments: data,
                   ),
                 ),
-                CustomReusableButton(
+                const CustomReusableButton(
                   text: "Competitive Price",
                 ),
-                CustomReusableButton(
+                const CustomReusableButton(
                   text: "Top Seller",
                 ),
               ],

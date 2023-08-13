@@ -8,6 +8,7 @@ import 'package:hiring_task/view-model/login/reset-password/reset_password_servi
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
 import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_two.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
+import 'package:hiring_task/widgets/dropdown_widget.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,7 @@ class _ResetScreenOneState extends State<ResetScreenOne> {
   final emailController = TextEditingController();
   List<String> activities = [];
   String? activityValue;
+  String? activityId;
   @override
   void dispose() {
     emailController.dispose();
@@ -62,47 +64,75 @@ class _ResetScreenOneState extends State<ResetScreenOne> {
                           child: Text("User on this email not found"),
                         );
                       }
-                      final snap = snapshot.data as Map<String, dynamic>;
-                      final listOfAcitivies = snap['activities'] as List;
-                      activities = listOfAcitivies
-                          .where((activity) => activity != null)
-                          .map((e) => e.toString())
+                      final snap = snapshot.data;
+                      final listOfAcitivies = snap;
+                      activities = listOfAcitivies!
+                          .where((activity) => (activity.activity != null ||
+                              activity.activity != "null"))
+                          .map((e) => e.activity.toString())
                           .toList();
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: FittedBox(
-                          child: SizedBox(
-                            height: 100,
-                            child: Card(
-                              elevation: 5,
-                              child: DropdownButton(
-                                  value: activityValue,
-                                  items: activities
-                                      .where((element) => element.isNotEmpty)
-                                      .map<DropdownMenuItem<String>>(
-                                        (String v) => DropdownMenuItem<String>(
-                                          value: v,
-                                          child: FittedBox(child: Text(v)),
-                                        ),
-                                      )
-                                      .toList(),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      activityValue = newValue!;
-                                      Provider.of<LoginProvider>(context,
-                                              listen: false)
-                                          .setActivity(activityValue);
-                                      Provider.of<LoginProvider>(context,
-                                              listen: false)
-                                          .setEmail(emailController.text);
-                                      Navigator.of(context).pop();
-                                    });
-                                  }),
-                            ),
-                          ),
-                        ),
+                      activityId = listOfAcitivies
+                          .where(
+                              (element) => element.activity == activities.first)
+                          .first
+                          .activityID
+                          .toString();
+                      return DropdownWidget(
+                        value: activityValue ?? activities.first,
+                        list: activities,
+                        onChanged: (value) {
+                          setState(() {
+                            activityValue = value;
+                            activityId = listOfAcitivies
+                                .where((element) =>
+                                    element.activity == activityValue)
+                                .first
+                                .activityID
+                                .toString();
+                            Provider.of<LoginProvider>(context, listen: false)
+                                .setActivity(activityValue);
+                            Provider.of<LoginProvider>(context, listen: false)
+                                .setEmail(emailController.text);
+                            Navigator.of(context).pop();
+                          });
+                        },
                       );
+
+                      // SizedBox(
+                      //   width: double.infinity,
+                      //   height: 60,
+                      //   child: FittedBox(
+                      //     child: SizedBox(
+                      //       height: 100,
+                      //       child: Card(
+                      //         elevation: 5,
+                      //         child: DropdownButton(
+                      //             value: activityValue,
+                      //             items: activities
+                      //                 .where((element) => element.isNotEmpty)
+                      //                 .map<DropdownMenuItem<String>>(
+                      //                   (String v) => DropdownMenuItem<String>(
+                      //                     value: v,
+                      //                     child: FittedBox(child: Text(v)),
+                      //                   ),
+                      //                 )
+                      //                 .toList(),
+                      //             onChanged: (String? newValue) {
+                      //               setState(() {
+                      //                 activityValue = newValue!;
+                      //                 Provider.of<LoginProvider>(context,
+                      //                         listen: false)
+                      //                     .setActivity(activityValue);
+                      //                 Provider.of<LoginProvider>(context,
+                      //                         listen: false)
+                      //                     .setEmail(emailController.text);
+                      //                 Navigator.of(context).pop();
+                      //               });
+                      //             }),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // );
                     }),
               ],
             ),
@@ -191,16 +221,24 @@ class _ResetScreenOneState extends State<ResetScreenOne> {
                               .toString();
                       try {
                         ResetPasswordServices.forgotPassword(
-                                emailController.text, activityValue.toString())
-                            .then((value) {
+                          emailController.text,
+                          activityValue.toString(),
+                          activityId.toString(),
+                        ).then((value) {
                           AppDialogs.closeDialog();
                           Common.showToast(
                             "Sent verification code to your email",
                             backgroundColor: Theme.of(context).primaryColor,
                           );
-                          Navigator.pushNamed(
+                          Navigator.push(
                             context,
-                            ResetScreenTwo.routeName,
+                            MaterialPageRoute(
+                              builder: (context) => ResetScreenTwo(
+                                email: emailController.text,
+                                activity: activityValue.toString(),
+                                activityId: activityId.toString(),
+                              ),
+                            ),
                           );
                         }).catchError(
                           (error) {

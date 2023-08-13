@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/models/ingredientsModel.dart';
-
+import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/utils/url.dart';
 import 'package:hiring_task/widgets/custom_appbar_widget.dart';
@@ -18,7 +17,7 @@ class LogisticInformationScreen extends StatelessWidget {
 
   Future<IngredientsModel> getFutureData(BuildContext context) async {
     final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic?>;
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final String? id = args['id'];
     final String? gtin = args['gtin'];
 
@@ -50,8 +49,8 @@ class LogisticInformationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic?>;
-    final String gtin = args['gtin'];
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    // final String gtin = args['gtin'];
     final ProductContentsListModel dataModel = args['dataModel'];
     return Scaffold(
       appBar: HomeAppBarWidget(context),

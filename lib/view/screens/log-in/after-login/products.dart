@@ -196,8 +196,8 @@ class _ProductsState extends State<Products> {
                         final brandName = snap?[index].brandName;
                         final frontImage =
                             "$imagePath/${snap?[index].frontImage}";
-                        final backImage =
-                            "$imagePath/${snap?[index].backImage}";
+                        // final backImage =
+                        //     "$imagePath/${snap?[index].backImage}";
 
                         return Card(
                           elevation: 2,

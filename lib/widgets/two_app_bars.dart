@@ -25,7 +25,8 @@ class TwoAppBars extends StatelessWidget {
     return Column(
       children: [
         AppBar(
-          backgroundColor: firstBgColor ?? Color.fromARGB(255, 14, 91, 60),
+          backgroundColor:
+              firstBgColor ?? const Color.fromARGB(255, 14, 91, 60),
           foregroundColor: firstFgColor ?? pinkColor,
           title: Text(firstText ?? "Republic Of Utopia"),
           automaticallyImplyLeading: false,

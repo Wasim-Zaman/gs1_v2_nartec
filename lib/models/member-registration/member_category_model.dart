@@ -51,7 +51,7 @@ class MemberCategoryModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['member_category_description'] = memberCategoryDescription;
     data['total_no_of_barcodes'] = totalNoOfBarcodes;

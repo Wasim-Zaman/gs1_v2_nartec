@@ -1,8 +1,10 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/models/safety_info_model.dart';
-import 'package:hiring_task/view-model/product-safety/product_safety_services.dart';
 import 'package:hiring_task/utils/colors.dart';
+import 'package:hiring_task/view-model/product-safety/product_safety_services.dart';
 import 'package:hiring_task/view/screens/safety_information_screen.dart';
 
 class ProductSafetyGrid extends StatelessWidget {

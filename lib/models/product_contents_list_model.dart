@@ -54,7 +54,7 @@ class ProductContentsListModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['gtin'] = gtin;
     data['companyName'] = companyName;
     data['licenceKey'] = licenceKey;

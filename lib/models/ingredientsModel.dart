@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class IngredientsModel {
   String? iD;
   String? productAllergenInformation;
@@ -61,7 +63,7 @@ class IngredientsModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['ID'] = iD;
     data['ProductAllergenInformation'] = productAllergenInformation;
     data['ProductNutrientsInformation'] = productNutrientsInformation;

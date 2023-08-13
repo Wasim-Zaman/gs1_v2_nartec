@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:hiring_task/providers/login_provider.dart';
 import 'package:hiring_task/res/common/common.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/view-model/login/reset-password/reset_password_services.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
 import 'package:hiring_task/widgets/required_text_widget.dart';
-import 'package:provider/provider.dart';
 
 class ResetScreenThree extends StatefulWidget {
-  const ResetScreenThree({super.key});
+  final String email, activity, activityId;
+  const ResetScreenThree({
+    super.key,
+    required this.email,
+    required this.activity,
+    required this.activityId,
+  });
   static const String routeName = 'reset-screen-three';
 
   @override
@@ -21,9 +26,10 @@ class _ResetScreenThreeState extends State<ResetScreenThree> {
   final confirmPasswordController = TextEditingController();
 
   resetPassword() {
-    final email = Provider.of<LoginProvider>(context, listen: false).email;
-    final activity =
-        Provider.of<LoginProvider>(context, listen: false).activity;
+    AppDialogs.loadingDialog(context);
+    final email = widget.email;
+    final activity = widget.activity;
+    final activityId = widget.activityId;
 
     try {
       ResetPasswordServices.resetPassword(
@@ -31,7 +37,9 @@ class _ResetScreenThreeState extends State<ResetScreenThree> {
         activity.toString(),
         newPasswordController.text,
         confirmPasswordController.text,
+        activityId.toString(),
       ).then((_) {
+        AppDialogs.closeDialog();
         Common.showToast("Password reset successfully");
         Navigator.pushNamedAndRemoveUntil(
           context,
@@ -39,9 +47,11 @@ class _ResetScreenThreeState extends State<ResetScreenThree> {
           (route) => false,
         );
       }).catchError((e) {
+        AppDialogs.closeDialog();
         Common.showToast(e.toString(), backgroundColor: Colors.red);
       });
     } catch (e) {
+      AppDialogs.closeDialog();
       Common.showToast(e.toString(), backgroundColor: Colors.red);
     }
   }

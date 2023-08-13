@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/models/recipe_model.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/widgets/custom_image_widget.dart';

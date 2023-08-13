@@ -300,7 +300,7 @@ class GtinSubscription extends StatefulWidget {
 class _GtinSubscriptionState extends State<GtinSubscription> {
   @override
   Widget build(BuildContext context) {
-    final gtin = widget.response.gtinSubscription;
+    // final gtin = widget.response.gtinSubscription;
     return SingleChildScrollView(
       child: Column(
         children: [

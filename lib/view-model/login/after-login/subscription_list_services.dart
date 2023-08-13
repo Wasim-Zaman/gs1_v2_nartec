@@ -20,14 +20,10 @@ class SubscriptionListServices {
           'Host': BaseUrl.host,
         },
       );
-      print("user id: $userId");
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        print('body: $body');
         return SubscriptionListModel.fromJson(body);
       } else {
-        print('not fine');
-
         throw Exception('Unable to fetch member subscription');
       }
     } catch (e) {

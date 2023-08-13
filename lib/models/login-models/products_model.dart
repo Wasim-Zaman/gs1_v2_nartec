@@ -9,16 +9,16 @@ class ProductsModel {
     if (json['products'] != null) {
       products = <Products>[];
       json['products'].forEach((v) {
-        products!.add(new Products.fromJson(v));
+        products!.add(Products.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['image_path'] = this.imagePath;
-    if (this.products != null) {
-      data['products'] = this.products!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['image_path'] = imagePath;
+    if (products != null) {
+      data['products'] = products!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -59,16 +59,16 @@ class Products {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['gcpGLNID'] = this.gcpGLNID;
-    data['productnameenglish'] = this.productnameenglish;
-    data['productnamearabic'] = this.productnamearabic;
-    data['BrandName'] = this.brandName;
-    data['BrandNameAr'] = this.brandNameAr;
-    data['barcode'] = this.barcode;
-    data['gpc'] = this.gpc;
-    data['front_image'] = this.frontImage;
-    data['back_image'] = this.backImage;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['gcpGLNID'] = gcpGLNID;
+    data['productnameenglish'] = productnameenglish;
+    data['productnamearabic'] = productnamearabic;
+    data['BrandName'] = brandName;
+    data['BrandNameAr'] = brandNameAr;
+    data['barcode'] = barcode;
+    data['gpc'] = gpc;
+    data['front_image'] = frontImage;
+    data['back_image'] = backImage;
     return data;
   }
 }

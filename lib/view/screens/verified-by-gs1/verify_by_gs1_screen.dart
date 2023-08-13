@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/view-model/base-api/base_api_service.dart';

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:hiring_task/constants/colors/app_colors.dart';
 import 'package:hiring_task/constants/images/drawer_images.dart';
 import 'package:hiring_task/constants/images/other_images.dart';
+import 'package:hiring_task/utils/app_url_launcher.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/home/home_services.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
@@ -250,7 +251,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.builder(
                   itemBuilder: (context, index) {
                     return RectangularTextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (index == 1 || index == 2) {
+                          AppUrlLauncher.whatsapp();
+                        }
+                      },
                       caption: names[index],
                     );
                   },

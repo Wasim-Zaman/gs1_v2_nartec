@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, file_names
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -88,11 +90,11 @@ class _OffersNearMeScreenState extends State<OffersNearMeScreen> {
               _controller.complete(controller);
               // addMarker(37.7749, -122.4194); // San Francisco
               // addMarker(40.7128, -74.0060); // New York City
-              data.forEach((element) {
+              for (var element in data) {
                 double lat = double.parse(element.itemGPSOnGoLat.toString());
                 double lng = double.parse(element.itemGPSOnGoLon.toString());
                 addMarker(lat, lng, element, element.trxGLNIDTo.toString());
-              });
+              }
             },
             initialCameraPosition: const CameraPosition(
               target: LatLng(23.885942, 45.079163),

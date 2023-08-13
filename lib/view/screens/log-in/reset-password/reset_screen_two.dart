@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiring_task/providers/login_provider.dart';
 import 'package:hiring_task/res/common/common.dart';
+import 'package:hiring_task/utils/app_dialogs.dart';
 import 'package:hiring_task/view-model/login/reset-password/reset_password_services.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
 import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_three.dart';
@@ -9,8 +10,16 @@ import 'package:hiring_task/widgets/required_text_widget.dart';
 import 'package:provider/provider.dart';
 
 class ResetScreenTwo extends StatefulWidget {
-  const ResetScreenTwo({super.key});
+  final String email, activity, activityId;
+
   static const String routeName = 'reset-screen-two';
+
+  const ResetScreenTwo({
+    super.key,
+    required this.email,
+    required this.activity,
+    required this.activityId,
+  });
 
   @override
   State<ResetScreenTwo> createState() => _ResetScreenTwoState();
@@ -21,28 +30,46 @@ class _ResetScreenTwoState extends State<ResetScreenTwo> {
   final codeController = TextEditingController();
 
   verifyCode() {
-    final email = Provider.of<LoginProvider>(context, listen: false).email;
-    final activity =
-        Provider.of<LoginProvider>(context, listen: false).activity;
+    AppDialogs.loadingDialog(context);
+    final email = widget.email;
+    final activity = widget.activity;
     Provider.of<LoginProvider>(context, listen: false).setOtp(
       codeController.text,
     );
+
+    final activityId = widget.activityId;
 
     try {
       ResetPasswordServices.verifyCode(
         email.toString(),
         activity.toString(),
-        codeController.text,
+        activityId.toString(),
+        codeController.text.trim(),
       ).then((_) {
+        AppDialogs.closeDialog();
         Common.showToast("Create your new password");
-        Navigator.pushNamed(
+        Navigator.push(
           context,
-          ResetScreenThree.routeName,
+          MaterialPageRoute(
+            builder: (context) => ResetScreenThree(
+              email: email,
+              activity: activity,
+              activityId: activityId,
+            ),
+          ),
         );
+        // Navigator.pushNamed(
+        //   context,
+        //   ResetScreenThree.routeName,
+        // );
       }).catchError((e) {
+        AppDialogs.closeDialog();
+
         Common.showToast(e.toString(), backgroundColor: Colors.red);
       });
     } catch (e) {
+      AppDialogs.closeDialog();
+
       Common.showToast(e.toString(), backgroundColor: Colors.red);
     }
   }

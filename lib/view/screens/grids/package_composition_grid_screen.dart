@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hiring_task/models/product_contents_list_model.dart';
+import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/package-composition/pkg_comp_grid_services.dart';
 import 'package:hiring_task/view/screens/packaging_composition_screen.dart';
-import 'package:hiring_task/utils/colors.dart';
 
 class PackageCompositionGridScreen extends StatelessWidget {
   static const routeName = "/package-composition-grid-screen";
@@ -31,7 +31,6 @@ class PackageCompositionGridScreen extends StatelessWidget {
       body: FutureBuilder(
         future: PkgCompGridServices.getData(context, gtin: dataModel.gtin),
         builder: (context, snapshot) {
-          print(snapshot.data);
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),

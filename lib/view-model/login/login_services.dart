@@ -92,7 +92,6 @@ class LoginServices {
         'Host': BaseUrl.host,
       },
     ).then((response) {
-      print("response.body ${response.body}");
       if (response.statusCode == 200) {
         // handle successful response
         final responseBody = json.decode(response.body) as Map<String, dynamic>;
@@ -122,15 +121,14 @@ class LoginServices {
           'Host': BaseUrl.host,
         },
       );
-      print("response.body ${response.body}");
       if (response.statusCode == 200) {
         // handle successful response
         final responseBody = json.decode(response.body);
         final activitiesList = responseBody["activities"] as List;
         List<ActivitiesModel> activities = [];
-        activitiesList.forEach((element) {
+        for (var element in activitiesList) {
           activities.add(ActivitiesModel.fromJson(element));
-        });
+        }
 
         return activities;
       } else if (response.statusCode == 404) {
@@ -161,7 +159,7 @@ class ActivitiesModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['activity'] = activity;
     data['activityID'] = activityID;
     return data;

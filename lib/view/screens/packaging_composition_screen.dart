@@ -100,7 +100,7 @@ class PageSingleInstance extends StatelessWidget {
   }
 
   thirdSection() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CustomRowWidget(

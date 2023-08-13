@@ -9,7 +9,6 @@ class GetAllCountriesServices {
   static Future<List<GetCountriesModel>> getList() async {
     const String url = '${BaseUrl.gs1}/api/countries/list';
     final response = await http.get(Uri.parse(url));
-    print('response: ${response.body}');
     if (response.statusCode == 200) {
       final responseBody = json.decode(response.body)['countries'] as List;
       for (var element in responseBody) {

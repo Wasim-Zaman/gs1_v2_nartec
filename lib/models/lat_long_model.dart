@@ -18,7 +18,7 @@ class LatLongModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['ItemRefNo'] = itemRefNo;
     data['ItemGPSOnGoLat'] = itemGPSOnGoLat;
     data['ItemGPSOnGoLon'] = itemGPSOnGoLon;

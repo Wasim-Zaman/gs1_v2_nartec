@@ -10,7 +10,6 @@ class DocumentServices {
   static Future<List<DocumentsModel>> getDocuments() {
     return http.get(Uri.parse(url)).then((response) {
       if (response.statusCode == 200) {
-        print('200');
         final responseBody = json.decode(response.body) as List;
         final List<DocumentsModel> documents = responseBody
             .map((document) => DocumentsModel.fromJson(document))

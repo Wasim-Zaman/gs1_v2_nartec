@@ -1,24 +1,20 @@
 // ignore_for_file: must_be_immutable
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/providers/product.dart';
+import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/base-api/base_api_service.dart';
 import 'package:hiring_task/view/screens/grids/logistic_info_grid_screen.dart';
 import 'package:hiring_task/view/screens/grids/product_contents_grid_screen.dart';
 import 'package:hiring_task/view/screens/grids/recipe_grid_screen.dart';
-import 'package:hiring_task/utils/colors.dart';
-import 'package:hiring_task/utils/url.dart';
 import 'package:hiring_task/widgets/custom_image_widget.dart';
 import 'package:hiring_task/widgets/home_appbar_widget.dart';
 import 'package:hiring_task/widgets/secondary_appbar_widget.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class RetailorShopperScreen extends StatelessWidget {
-  RetailorShopperScreen({super.key});
+  const RetailorShopperScreen({super.key});
 
   static const routeName = '/retailor_shopper_screen';
 

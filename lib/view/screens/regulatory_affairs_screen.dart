@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/providers/gtin.dart';
+import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/base-api/base_api_service.dart';
 import 'package:hiring_task/view/screens/custom_and_border_check_screen.dart';
-import 'package:hiring_task/view/screens/grids/custom_&_border_grid.dart';
 import 'package:hiring_task/view/screens/grids/package_composition_grid_screen.dart';
 import 'package:hiring_task/view/screens/grids/product_safety_grid.dart';
-import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/widgets/custom_appbar_widget.dart';
 import 'package:hiring_task/widgets/custom_image_widget.dart';
 import 'package:hiring_task/widgets/home_appbar_widget.dart';

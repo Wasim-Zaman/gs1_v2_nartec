@@ -66,7 +66,6 @@ class Common {
   */
 
   static Future<File> urlToFile(String imageUrl) async {
-    print('Download image from $imageUrl');
     final response = await http.get(Uri.parse(imageUrl));
     final bytes = response.bodyBytes;
     final fileName = imageUrl.split('/').last;

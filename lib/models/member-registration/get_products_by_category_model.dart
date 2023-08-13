@@ -8,19 +8,19 @@ class GetProductsByCategoryModel {
     if (json['gtinProducts'] != null) {
       gtinProducts = <GtinProducts>[];
       json['gtinProducts'].forEach((v) {
-        gtinProducts!.add(new GtinProducts.fromJson(v));
+        gtinProducts!.add(GtinProducts.fromJson(v));
       });
     }
     if (json['otherProducts'] != null) {
       otherProducts = <OtherProducts>[];
       json['otherProducts'].forEach((v) {
-        otherProducts!.add(new OtherProducts.fromJson(v));
+        otherProducts!.add(OtherProducts.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (gtinProducts != null) {
       data['gtinProducts'] = gtinProducts!.map((v) => v.toJson()).toList();
     }
@@ -60,7 +60,7 @@ class GtinProducts {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['productID'] = productID;
     data['productName'] = productName;
     data['total_barcodes'] = totalBarcodes;

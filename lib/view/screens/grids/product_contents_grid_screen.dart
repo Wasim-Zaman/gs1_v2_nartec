@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hiring_task/models/product_contents_list_model.dart';
+import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/ingredients/ingredients_services.dart';
 import 'package:hiring_task/view/screens/ingredients_and_allergens_scree.dart';
-import 'package:hiring_task/utils/colors.dart';
 
 class ProductContentsGridScreen extends StatelessWidget {
   static const routeName = "/product_contents_grid_screen";
@@ -27,7 +28,7 @@ class ProductContentsGridScreen extends StatelessWidget {
           centerTitle: true,
         ),
       ),
-      body: dataModel == null
+      body: dataModel.isBlank == true
           ? const Center(
               child: Text("Data list is empty"),
             )

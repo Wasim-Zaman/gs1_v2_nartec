@@ -7,6 +7,7 @@ class ResetPasswordServices {
   static Future<void> forgotPassword(
     String email,
     String activity,
+    String activityId,
   ) async {
     const baseUrl = '${BaseUrl.gs1}/api/member/forgot/password';
     final uri = Uri.parse(baseUrl);
@@ -17,6 +18,7 @@ class ResetPasswordServices {
           // body should include email
           'email': email,
           'activity': activity,
+          'activityID': activityId,
         },
       ),
       headers: {
@@ -27,7 +29,6 @@ class ResetPasswordServices {
     ).then((response) {
       if (response.statusCode == 200) {
         // handle successful response
-        print("response: ${json.decode(response.body)}");
       } else {
         throw Exception('Could not send code, please try again later');
       }
@@ -38,6 +39,7 @@ class ResetPasswordServices {
   static Future<void> verifyCode(
     String email,
     String activity,
+    String activityId,
     String code,
   ) async {
     const baseUrl = '${BaseUrl.gs1}/api/member/verify/forgot/password/code';
@@ -49,6 +51,7 @@ class ResetPasswordServices {
           // body should include email
           'email': email,
           'activity': activity,
+          'activityID': activityId,
           'code': code,
         },
       ),
@@ -74,6 +77,7 @@ class ResetPasswordServices {
     String activity,
     String password,
     String confirmPassword,
+    String activityId,
   ) async {
     const baseUrl = '${BaseUrl.gs1}/api/member/password/reset';
     final uri = Uri.parse(baseUrl);
@@ -86,6 +90,7 @@ class ResetPasswordServices {
           'activity': activity,
           'password': password,
           'password_confirmation': confirmPassword,
+          'activityID': activityId,
         },
       ),
       headers: {
@@ -96,7 +101,6 @@ class ResetPasswordServices {
     ).then((response) {
       if (response.statusCode == 200) {
         // handle successful response
-        print("response: ${json.decode(response.body)}");
       } else {
         throw Exception('Could not reset password, please try again later');
       }

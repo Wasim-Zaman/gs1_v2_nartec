@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, library_private_types_in_public_api
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -327,6 +329,8 @@ class _YesNoRadioButtonsState extends State<YesNoRadioButtons> {
 }
 
 class SuggestionTextField extends StatefulWidget {
+  const SuggestionTextField({super.key});
+
   @override
   _SuggestionTextFieldState createState() => _SuggestionTextFieldState();
 }
@@ -335,7 +339,7 @@ class _SuggestionTextFieldState extends State<SuggestionTextField> {
   final TextEditingController _textEditingController = TextEditingController();
   final List<String> _suggestions = ['Apple', 'Banana', 'Cherry', 'Durian'];
 
-  String _selectedSuggestion = '';
+  String selectedSuggestion = '';
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +355,7 @@ class _SuggestionTextFieldState extends State<SuggestionTextField> {
       onSelected: (String suggestion) {
         _textEditingController.text = suggestion;
         setState(() {
-          _selectedSuggestion = suggestion;
+          selectedSuggestion = suggestion;
         });
       },
       fieldViewBuilder: (BuildContext context,
@@ -365,7 +369,7 @@ class _SuggestionTextFieldState extends State<SuggestionTextField> {
           ),
           onChanged: (value) {
             setState(() {
-              _selectedSuggestion = '';
+              selectedSuggestion = '';
             });
           },
         );
@@ -405,6 +409,7 @@ class NumericSuggestionBox extends StatefulWidget {
   _NumericSuggestionBoxState createState() => _NumericSuggestionBoxState();
 
   NumericSuggestionBox({
+    super.key,
     this.selectedValue,
     this.suggestions,
     this.onSuggestionSelected,

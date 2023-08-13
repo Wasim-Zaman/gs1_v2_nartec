@@ -15,7 +15,6 @@ class GetAllCitiesServices {
         headers: {
           'Content-Type': 'application/json',
         });
-    print("********************* state id: ${response.body}");
     if (response.statusCode == 200) {
       final responseBody = json.decode(response.body)['city'] as List;
       for (var element in responseBody) {

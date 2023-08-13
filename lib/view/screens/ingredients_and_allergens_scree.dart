@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hiring_task/models/ingredientsModel.dart';
 import 'package:hiring_task/models/product_contents_list_model.dart';
 import 'package:hiring_task/utils/colors.dart';
-import 'package:hiring_task/view-model/ingredients/ingredients_services.dart';
 import 'package:hiring_task/widgets/home_appbar_widget.dart';
 import 'package:hiring_task/widgets/two_app_bars.dart';
 
@@ -14,7 +13,7 @@ class IngredientsAndAllergensScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic?>;
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final IngredientsModel? ingModel = args['ingModel'];
     final String? gtin = args['gtin'];
     final ProductContentsListModel dataModel = args['dataModel'];

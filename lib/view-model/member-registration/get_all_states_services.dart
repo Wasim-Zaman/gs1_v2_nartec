@@ -21,7 +21,6 @@ class GetAllStatesServices {
       for (var element in responseBody) {
         futureData.add(GetAllStatesModel.fromJson(element));
       }
-      print("*********************** ${futureData.length}");
       return futureData;
     } else {
       throw Exception('Failed to load data');

@@ -53,10 +53,10 @@ class _SSCCScreenState extends State<SSCCScreen> {
               );
             }
             if (!snapshot.hasData) {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(
                       Icons.error_outline_sharp,
                       size: 100,

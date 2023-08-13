@@ -69,7 +69,6 @@ class MemberProfileServices {
       filename: image.path,
     );
 
-    print("image multipart file: ${imageMultipartFile.filename}");
     request.files.add(imageMultipartFile);
 
     var addressImageStream = http.ByteStream(addressImage!.openRead());
@@ -82,22 +81,16 @@ class MemberProfileServices {
     );
     request.files.add(addressImageMultipartFile);
 
-    print('sending....');
-
     try {
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
-      print("Response body: $responseBody");
       if (response.statusCode == 200) {
-        print(responseBody);
         return 200;
       } else if (response.statusCode == 422) {
         throw Exception(responseBody);
       } else if (response.statusCode == 500) {
-        print(response.statusCode);
         throw Exception('Internal Server Error!');
       } else {
-        print(response.statusCode);
         return response.statusCode;
       }
     } catch (error) {

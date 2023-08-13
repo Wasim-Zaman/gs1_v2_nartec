@@ -18,8 +18,6 @@ import 'package:hiring_task/view/screens/log-in/after-login/sscc_screen.dart';
 import 'package:hiring_task/view/screens/log-in/after-login/subscribe_products_screen.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
 import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_one.dart';
-import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_three.dart';
-import 'package:hiring_task/view/screens/log-in/reset-password/reset_screen_two.dart';
 import 'package:hiring_task/view/screens/logistic_information_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/get_barcode_screen.dart';
 import 'package:hiring_task/view/screens/member-screens/memeber_registration_screen.dart';
@@ -43,7 +41,8 @@ class RoutesManagement {
       HomeScreen.routeName: (context) => const HomeScreen(),
       Gs1MemberLoginScreen.routeName: (context) => const Gs1MemberLoginScreen(),
       QRCodeScanningScreen.routeName: (context) => const QRCodeScanningScreen(),
-      RetailorShopperScreen.routeName: (context) => RetailorShopperScreen(),
+      RetailorShopperScreen.routeName: (context) =>
+          const RetailorShopperScreen(),
       ProductContentsGridScreen.routeName: (context) =>
           const ProductContentsGridScreen(),
       IngredientsAndAllergensScreen.routeName: (context) =>
@@ -72,7 +71,7 @@ class RoutesManagement {
       CustomAndBorderCheckScreen.routeName: (context) =>
           const CustomAndBorderCheckScreen(),
       GetBarcodeScreen.routeName: (context) => const GetBarcodeScreen(),
-      GtinReporterScreen.routeName: (context) => GtinReporterScreen(),
+      GtinReporterScreen.routeName: (context) => const GtinReporterScreen(),
       OffersNearMeScreen.routeName: (context) => const OffersNearMeScreen(),
       SingleEventScreen.routeName: (context) => const SingleEventScreen(),
       DirectionMarkScreen.routeName: (context) => const DirectionMarkScreen(),
@@ -94,8 +93,8 @@ class RoutesManagement {
       // RenewMembershipScreen.routeName: (context) =>
       //     const RenewMembershipScreen(),
       ResetScreenOne.routeName: (context) => const ResetScreenOne(),
-      ResetScreenTwo.routeName: (context) => const ResetScreenTwo(),
-      ResetScreenThree.routeName: (context) => const ResetScreenThree(),
+      // ResetScreenTwo.routeName: (context) => const ResetScreenTwo(),
+      // ResetScreenThree.routeName: (context) => const ResetScreenThree(),
     };
   }
 }

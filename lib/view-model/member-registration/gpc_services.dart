@@ -19,7 +19,6 @@ class GpcService {
             'Accept': 'application/json',
             'Host': BaseUrl.hostWithPort,
           });
-      print("status code is ${response.statusCode}");
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
         final gpcMap = responseBody['gpc'];
