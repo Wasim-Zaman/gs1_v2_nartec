@@ -63,6 +63,7 @@ dependencies:
   country_code_picker: ^3.0.0
   ionicons: ^0.2.2
   velocity_x: ^4.1.0
+  flutter_html:
   
 
 dev_dependencies:
@@ -98,6 +99,7 @@ flutter:
     - assets/images/
     - assets/otherImages/
     - assets/drawerImages/
+    - assets/icons/socialmedia/
     - assets/icons/membership_icons/
     - assets/icons/create_ticket_icons/
   #   - images/a_dot_ham.jpeg

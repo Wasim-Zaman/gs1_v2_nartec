@@ -6,17 +6,19 @@ class PrimaryButtonWidget extends StatelessWidget {
   final String caption;
   final VoidCallback onPressed;
   final double? buttonWidth;
+  final double? buttonHeight;
   const PrimaryButtonWidget(
       {Key? key,
       required this.caption,
       required this.onPressed,
-      this.buttonWidth})
+      this.buttonWidth,
+      this.buttonHeight})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
       width: buttonWidth ?? context.width * 0.3,
-      height: context.height * 0.06,
+      height: buttonHeight ?? context.height * 0.06,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       decoration: BoxDecoration(
         color: AppColors.primaryColor,

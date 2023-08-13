@@ -4,11 +4,14 @@ import 'package:get/get.dart';
 import 'package:hiring_task/constants/colors/app_colors.dart';
 import 'package:hiring_task/constants/images/drawer_images.dart';
 import 'package:hiring_task/constants/images/other_images.dart';
+import 'package:hiring_task/controllers/home/social_media_controller.dart';
 import 'package:hiring_task/utils/app_url_launcher.dart';
 import 'package:hiring_task/utils/colors.dart';
 import 'package:hiring_task/view-model/home/home_services.dart';
+import 'package:hiring_task/view/screens/home/help_desk/home_help_desk_screen.dart';
 import 'package:hiring_task/view/screens/log-in/gs1_member_login_screen.dart';
 import 'package:hiring_task/widgets/buttons/rectangular_text_button.dart';
+import 'package:hiring_task/widgets/loading/loading_widget.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,6 +29,143 @@ class _HomeScreenState extends State<HomeScreen> {
     'Chat with us',
     'Social Media',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  socialMediaBottomSheet() {
+    // showDialog(
+    //   context: context,
+    //   builder: (context) => Dialog(
+    //     child: FutureBuilder(
+    //       future: SocialMediaController.getSocialMedias(),
+    //       builder: (context, snapshot) {
+    //         if (snapshot.connectionState == ConnectionState.waiting) {
+    //           return SizedBox(
+    //             height: context.height * 0.4,
+    //             child: const Center(
+    //               child: LoadingWidget(),
+    //             ),
+    //           );
+    //         } else if (snapshot.hasError) {
+    //           return SizedBox(
+    //             height: context.height * 0.4,
+    //             child: Center(
+    //               child: Text(snapshot.error.toString()),
+    //             ),
+    //           );
+    //         }
+    //         return Container(
+    //           decoration: const BoxDecoration(
+    //             color: AppColors.backgroundColor,
+    //             borderRadius: BorderRadius.only(
+    //               topLeft: Radius.circular(20),
+    //               topRight: Radius.circular(20),
+    //             ),
+    //           ),
+    //           height: context.height * 0.4,
+    //           child: GridView.builder(
+    //             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    //               crossAxisCount: 3,
+    //               childAspectRatio: 1.5,
+    //               crossAxisSpacing: 20,
+    //               mainAxisSpacing: 20,
+    //             ),
+    //             itemBuilder: (context, index) => GestureDetector(
+    //               onTap: () {
+    //                 AppUrlLauncher.launchUrl(
+    //                   Uri.parse(
+    //                     snapshot.data!.socialLinks![index].socialLink
+    //                         .toString(),
+    //                   ),
+    //                 );
+    //               },
+    //               child: CircleAvatar(
+    //                   backgroundColor: AppColors.greyColor,
+    //                   backgroundImage: NetworkImage(
+    //                     "${snapshot.data!.imagePath}/${snapshot.data!.socialLinks![index].socialIcon}",
+    //                   )),
+    //             ),
+    //             padding: const EdgeInsets.all(20),
+    //             itemCount: snapshot.data?.socialLinks?.length,
+    //           ),
+    //         );
+    //       },
+    //     ),
+    //   ),
+    // );
+    showModalBottomSheet(
+        context: context,
+        enableDrag: true,
+        isDismissible: true,
+        showDragHandle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        builder: (BuildContext context) {
+          return FutureBuilder(
+            future: SocialMediaController.getSocialMedias(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SizedBox(
+                  height: context.height * 0.4,
+                  child: const Center(
+                    child: LoadingWidget(),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return SizedBox(
+                  height: context.height * 0.4,
+                  child: Center(
+                    child: Text(snapshot.error.toString()),
+                  ),
+                );
+              }
+              return Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.backgroundColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                height: context.height * 0.4,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 1.2,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                  ),
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () {
+                      AppUrlLauncher.launchUrl(
+                        Uri.parse(
+                          snapshot.data!.socialLinks![index].socialLink
+                              .toString(),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                        backgroundColor: AppColors.greyColor,
+                        backgroundImage: NetworkImage(
+                          "${snapshot.data!.imagePath}/${snapshot.data!.socialLinks![index].socialIcon}",
+                        )),
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  itemCount: snapshot.data?.socialLinks?.length,
+                ),
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -252,8 +392,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     return RectangularTextButton(
                       onPressed: () {
-                        if (index == 1 || index == 2) {
+                        if (index == 0) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomeHelpDeskScreen(),
+                            ),
+                          );
+                        } else if (index == 1) {
+                          AppUrlLauncher.call();
+                        } else if (index == 2) {
                           AppUrlLauncher.whatsapp();
+                        } else if (index == 3) {
+                          // show modal bottm sheet and display social media icons like facebook, twitter, instagram, youtube and linked in
+
+                          socialMediaBottomSheet();
                         }
                       },
                       caption: names[index],
